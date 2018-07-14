@@ -1,0 +1,41 @@
+@import url(http://fonts.googleapis.com/css?family=Oswald);
+
+body {
+      padding: 0;
+      margin: 0;
+      font: 100% 'Oswald', 'Helvetica Neue', Helvetica, sans-serif;
+      background-color: #9ab973;
+      }
+
+html, body, #map {
+      height: 100%;
+      width: 100%;
+        }
+
+/*#controls {
+  width: 100%;
+  margin: 0 auto;
+  float: left;
+}*/
+
+#form {
+  margin-top: 5px;
+  font-size: 12px;
+  text-align: left;
+  line-height: 16px;
+  width:375px;
+  float: left;
+}
+
+
+.container-fluid{
+  z-index:999;
+  height: auto;
+  width: auto;
+  padding: auto;
+  margin: auto;
+ /* position:absolute;
+  left:0px;
+  top:0px;*/
+
+}
