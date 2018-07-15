@@ -3,21 +3,19 @@
 //storing the username for this session
 session_start();
 
-//if variable existiert und ob sie nicht NULL ist
-if (!isset($_SESSION['username'])) {
-  $_SESSION['username'] = 0;
-  if (empty($_POST['name'])){
-  echo '<div class="container" style="text-align:center">please choose a username</div>';
-  }
-} else {
+if ($_POST) {
   $_SESSION['username'] = $_POST["name"];
   $_SESSION['count'] =0;
-  $_SESSION['token'] =0;
-  $_SESSION['land'] = 0;
+  $_SESSION['token'] =$_SESSION['token'] - $_POST["variable2"];
+
+  $_SESSION['land'] = $_SESSION['land']+$_POST["variable1"];
   //create an array and shuffle it for each user once
   $_SESSION['array'] = range(0,109);
   shuffle($_SESSION['array']);
   header("Location: index.php");
+ 
+} else {
+  $_SESSION['username'] = "";
 }
 
    
@@ -42,7 +40,7 @@ if (!isset($_SESSION['username'])) {
         </div>
         <form method="post">
         enter your playername: <br>
-        <input type="text" name="name"><br>
+        <input type="text" name="name" required><br>
         <input type="submit">
         </form>
     </div>

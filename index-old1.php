@@ -2,19 +2,24 @@
 session_start();
 
 $pageWasRefreshed = isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] === 'max-age=0';
-$NoSearchPolys =5;
 
 //110 is length of points selected
 if($pageWasRefreshed) {
     $_SESSION['token']++;
     //echo $_SESSION['array'][$_SESSION['count']];
-    if ($_SESSION['count']< $NoSearchPolys){
+    $searchPolys = 110;
+    if ($_SESSION['count']<5){
     $_SESSION['count']++;
     } else {
     $_SESSION['count']=0;
     }
   }
 
+if(isset($_POST['submit'])) { // increasing
+    $_SESSION['land']++; // no need for extra variable (preincrement to echo immediately)
+}
+  //echo sizeof($_SESSION['array']);
+  //echo $_SESSION['land'];
 ?>
 
 <!DOCTYPE html>
@@ -51,7 +56,7 @@ if($pageWasRefreshed) {
 
   <body>
     <!-- -----------------the dialog element--------------------- -->
-    <div id="dialog" title="Point Information" style="display:none">     
+    <div id="dialog" title="Point Information">     
       <form>
         <fieldset style="border: none;">
           <ul style="list-style-type: none; padding-left: 0px">
@@ -78,7 +83,7 @@ if($pageWasRefreshed) {
       </form>
     </div>
 
-<!------------------------------- Navigation -------------------->
+    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
       <div class="container">
         <a class="navbar-brand" onclick="addButtons()" value="addbuttons" style="cursor:pointer">VACANT</a>
@@ -87,20 +92,11 @@ if($pageWasRefreshed) {
 
         <!-- <a class="navbar-brand" href="?inc=TRUE">Increment</a> -->
 
-<!--------------------- these are the control buttons for drawing (old)----------------------->
-       <!--  <div id="controls" style="display:none">
-          <a class="navbar-brand" onclick="startEdits()" value="Click to Start Editing" style="cursor:pointer">start editing</a>
-          <a class="navbar-brand" onclick="stopEdits()" value="Stop Your Editing Session" style="cursor:pointer">stop editing</a>
-          <a class="navbar-brand" onclick="stopEdits()" value="Stop Your Editing Session" style="cursor:pointer">save</a>
-        </div> -->
-
-<!--------------------- these are the control buttons for drawing (new)----------------------->
+<!--------------------- these are the drawing buttons ----------------------->
         <div id="controls" style="display:none">
-          <a id="startBtn" class="navbar-brand" style="cursor:pointer">start editing</a>
-          <a id="deleteBtn" class="navbar-brand" style="cursor:pointer">delete</a>
-          <a id="saveBtn" class="navbar-brand" style="cursor:pointer">save</a>
+        <a class="navbar-brand" onclick="startEdits()" value="Click to Start Editing" style="cursor:pointer">start editing</a>
+        <a class="navbar-brand" onclick="stopEdits()" value="Stop Your Editing Session" style="cursor:pointer">stop editing</a>
         </div>
-<!--------------------- all the rest in navbar ----------------------->       
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -121,7 +117,7 @@ if($pageWasRefreshed) {
         </div>
       </div>
     </nav>
-<!--------------------- this is the container with land and tokens ----------------------->  
+  
       <div class="container-fluid" style="pointer-events: none">
         <div class="row">
           <div class="col-md-12">
@@ -139,17 +135,8 @@ if($pageWasRefreshed) {
 
 <script>
   //counting site visits
-   var counter = 0;
+   var count = 10;
    var tokens = document.getElementById('tokens');
-
-   var hStyle = {
-    "stroke":true,
-    "color":"#15a956",//data.rows[i].strokeColor,
-    "weight":4,
-    "opacity":1,
-    "fill":false,
-    "clickable":false
-  }
    // var player = <?php //echo json_encode($_SESSION['number']); ?>;
    // tokens.innerHTML = '<p> you got ' + count + ' tokens and your username is '+ player + '</p>';
 
@@ -164,30 +151,26 @@ if($pageWasRefreshed) {
     var SQLquery = "SELECT * FROM data_game";
 
 
-    //show controls when button 'vacant' is pressed
     function addButtons(){
       console.log(document.getElementById('controls'));
       $("#controls").show(300);
-      //$.post("index-username.php", {"update": 10});
+      $.post("index-username.php", {"update": 10});
       //document.getElementById('controls').style.display = "block";
     }
 
     //get CARTO selection as geoJSON and add to leaflet map
     function getGeoJSON(){
       $.getJSON("https://"+cartoDBusername+".carto.com/api/v2/sql?format=GeoJSON&q="+SQLquery, function(data){
-        //do this with retrieved data
         cartoDBpoints=L.geoJson(data,{
-          style:hStyle,
           pointToLayer: function(feature, latlng){
             var marker = L.marker(latlng);
-            marker.bindPopup('' + feature.properties.usage + ' <br> belongs to ' + feature.properties.player1 + ' <br> '+feature.properties.no_falsified+' flagged this as false'+'');
+            marker.bindPopup('' + feature.properties.usage + ' <br> submitted by ' + feature.properties.player1 + ' <br> '+feature.properties.no_falsified+' flagged this as false'+'');
             return marker;
           }
         }).addTo(map);
       });
     };
 
-// L.geoJson('+geom+',{style:hStyle}).addTo(map'+rand+');'+
 
     function getRandomArbitrary(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
@@ -215,69 +198,21 @@ if($pageWasRefreshed) {
   });
     });
 
-//----------------this isn't working because of asynchronous!!!----------- 
-//https://www.web-design-talk.co.uk/303/store-ajax-response-jquery/
-    function getSession(){
-      var viewport_id;
-      $.getJSON("./data/points_selected.geojson",{contentType: "application/json; charset=UTF-8"},function(data){
-
-        viewport_id = data.features[session_key].properties.id;
-        //return viewport_id;
-        console.log('viewportID inside', viewport_id);
-        
-    });
-    return viewport_id;
-    }
-
-
-    console.log('viewportID outside', getSession());
+    // console.log('doesnt change', coords2);
 
 //----------------use leaflet.draw to add custom points-----------
 // Create Leaflet Draw Control for the draw tools and toolbox
-// var drawControl = new L.Control.Draw({
-//   draw : {
-//     polygon : false,
-//     polyline : false,
-//     rectangle : false,
-//     circle : false
-//   },
-//   edit : false,
-//   remove: false
-// });
 var drawControl = new L.Control.Draw({
-      position: 'topright',
-      draw:false,
-      edit:false
-      
-    });
+  draw : {
+    polygon : false,
+    polyline : false,
+    rectangle : false,
+    circle : false
+  },
+  edit : false,
+  remove: false
+});
 
- // Create Leaflet map object
-var map = L.map('map',{ center: [51.51, -0.10], zoom: 22,zoomControl:false});
-
-//----------------drawing polygons-----------
-  poly = new L.Draw.Polygon(map, {
-      allowIntersection: false,
-      showArea: false,
-      drawError: {
-      color: '#b00b00',
-      timeout: 1000
-    },
-    icon: new L.DivIcon({
-      iconSize: new L.Point(10,10),
-      className: 'leaflet-div-icon leaflet-editing-icon'
-    }),
-    shapeOptions: {
-      stroke: true,
-      color: '#ff0000',
-      weight: 1,
-      opacity: 0.7,
-      fill: true,
-      fillColor: null, //same as color by default
-      fillOpacity: 0.2,
-      clickable: true
-    },
-    guidelineDistance: 5,
-  })
 
 
 // Boolean global variable used to control visiblity
@@ -287,40 +222,29 @@ var controlOnMap = false;
 var drawnItems = new L.FeatureGroup();
 
 
-  $('#startBtn').on('click',function(){
+// Function to add the draw control to the map to start editing
+  function startEdits(){
     if(controlOnMap == true){
       map.removeControl(drawControl);
-      poly.enable();
       controlOnMap = false;
-      console.log('remove control if button is clicked again' + controlOnMap);
+      console.log('when does this situation come?' + controlOnMap);
     }
     map.addControl(drawControl);
     controlOnMap = true;
-    poly.enable();
-    console.log("add control of button is clicked once" + controlOnMap);
-    //$('#saveBtn').hide();
-  });
+    console.log("startEdit " + controlOnMap);
+  };
 
-  $('#deleteBtn').on('click',function(){
-    drawnItems.clearLayers();
-    poly.disable();
-    //$('#saveBtn').hide();
-  });
+  // Function to remove the draw control from the map
+  function stopEdits(){
+    map.removeControl(drawControl);
+    controlOnMap = false;
+    console.log("stopEdit " + controlOnMap);
+    window.location.reload();
+    };
 
-   $("#saveBtn").click(function(e){
-  //CHECK IF POLYGON IS COMPLETE
-    if(drawnItems.getLayers().length<1){
-      window.alert('Oops, you need to map a vacant lot first.'); }
-    //ELSE OPEN THE SUBMIT DIALOGUE
-    else{
-      map.removeControl(drawControl);
-      controlOnMap = false;
-      console.log("stopEdit " + controlOnMap);
-      dialog.dialog("open");
-      //$("#dialog").modal('show');
-    }
-  });
 
+    // Create Leaflet map object
+    var map = L.map('map',{ center: [51.51, -0.10], zoom: 22,zoomControl:false});
 
     //disable controls
     // zoomControl:false (goes in the above paort)
@@ -343,7 +267,7 @@ var drawnItems = new L.FeatureGroup();
     var layer = e.layer;
     drawnItems.addLayer(layer);
     map.addLayer(drawnItems);
-    //dialog.dialog("open");
+    dialog.dialog("open");
     console.log("run");
   });
 
@@ -378,6 +302,11 @@ var form = dialog.find("form").on("submit", function(event) {
   event.preventDefault();
 });
 
+// //retrieves IP address
+// $.getJSON('http://gd.geobytes.com/GetCityDetails?callback=?', function(data) {
+//   console.log(data.geobytesipaddress);
+//     // console.log(JSON.stringify(data, null, 2));
+// });
 
 //console.log('points number2', cartoDBpoints);
 
@@ -393,34 +322,6 @@ var submitToProxy = function(q){
     };
 
 
-var postData = function(url,data){
-  if ( !url || !data ) return;
-  data.cache = false;
-  data.timeStamp = new Date().getTime()
-  $.post(url,
-    data, function(d) {
-      //console.log(d);
-    });
-}
-
-// var land = function(q){
-//       $.post("index-username.php", { // <--- Enter the path to your callProxy.php file here
-//         //this is the text in post in php!
-//         variable:q
-//       }, function(data) {
-//         console.log(data);
-//       });
-//     };
-
-// var tokenUpdate = function(a){
-//       $.post("index-username.php", { // <--- Enter the path to your callProxy.php file here
-//         //this is the text in post in php!
-//         variable2:a
-//       }, function(data) {
-//         console.log(data);
-//       });
-//     };
-
 function timeConvert(unix){
   var a = new Date(unix * 1000);
   var year = a.getFullYear();
@@ -434,104 +335,48 @@ function timeConvert(unix){
 }
 
 //polygon: {"type": "Polygon","coordinates": [[ [100.0, 0.0], [101.0, 0.0], [101.0, 1.0],[100.0, 1.0], [100.0, 0.0] ] ]}
-// var player = <?php //echo json_encode($_SESSION['username']); ?>;
-// var player = 'hia';
+//var player = <?php //echo json_encode($_SESSION['username']); ?>;
+var player = 'hia';
 
-//this function is called when button in 'submit' dialog is pressed.
-//if this button is pressed, session variable 'land' needs to be updated.
 function setData() {
   //username and description are coming from html
-  var enteredUsername = <?php echo json_encode($_SESSION['username']); ?>;
-  //this will record one token less?
-  var token = <?php echo json_encode($_SESSION['token']); ?>;
+  var enteredUsername = player;
   //purpose of vacant land
   var e = document.getElementById("usage");
   var usage = e.options[e.selectedIndex].text;
   console.log('user selected this', usage);
 
-  //tracking the land count here. land() is defined above:
-  // land(1);
-  // tokenUpdate(5);
-
-  postData( "index-username.php", {
-    variable1: 1,
-    variable2: 5
-  });
-
-  //number of polygon that is searched. needs updating!
+  //polygon search
   var search_poly = 10;
+
 
   // ST_SetSRID(geometry geom, integer srid);
   drawnItems.eachLayer(function(layer){
-    var sql = "INSERT INTO data_game (the_geom,search_polygon,created_at,usage, player1,tokensOfPlayer) VALUES (ST_SetSRID(ST_GeomFromGeoJSON('";
-    
-    //OLD:
-    //var a = layer.getLatLng();
-    //gives you an array of latlngs
-
-    var a = layer._latlngs;
-    console.log('what is a', a);
-    var coords = "";
-    
-    console.log('latlng Arr: length: '+a.length+ " " +a);
-        for (var i = 0; i < a.length; i++) {
-          var lat = (a[i].lat).toFixed(4); // rid of rounding that was there for url length issue during dev
-          var lng = (a[i].lng).toFixed(4); // rid of rounding that was there for url length issue during dev
-          coords += '['+lng + ',' + lat+'],';
-
-          //console.log("my version", coords2);
-        // if(i==a.length-1){
-        //   var lat = (a[0].lat).toFixed(4);
-        //   var lng = (a[0].lng).toFixed(4);
-        //   coords2.push("["+lat,lng+"]");
-        //   coords += '['+lng + ',' + lat+']';
-        // }
-        }
-
-
+    var sql = "INSERT INTO data_game (the_geom,search_polygon,created_at,usage, player1, latitude,longitude) VALUES (ST_SetSRID(ST_GeomFromGeoJSON('";
+    var a = layer.getLatLng();
     var unixTime = Math.floor(Date.now() / 1000);
     console.log(unixTime);
-
-    //OLD
-    // var sql2 ='{"type":"Point","coordinates":[' + a.lng + "," + a.lat + "]}'),4326),'" + search_poly + "','" +  timeConvert(unixTime) + "','" + usage + "','" + enteredUsername + "','" + token + "','" + a.lat + "','" + a.lng +"')";
-
-    //NEW
-    var sql2 ='{"type":"MultiPolygon","coordinates":[[[' + coords + "]]]}'),4326),'" + search_poly + "','" +  timeConvert(unixTime) + "','" + usage + "','" + enteredUsername + "','" + token +"')";
-
-
-//     $q = "INSERT INTO " . $_POST['table'] . " (the_geom, city, description, name,city_yrs,nbrhd_yrs,flag,loved) VALUES (ST_SetSRID(ST_GeomFromGeoJSON('";
-// if ( $_POST['ext'] != "_point" ){
-//   $q .= '{"type":"MultiPolygon","coordinates":[[[' . $_POST['coords'] . "]]]}'";
-// } else {
-//   $q .= '{"type":"Point","coordinates":' . $_POST['coords'] . "}'";
-// }
-// $q .= "),4326),'". $_POST['city'] ."','" . $_POST['description'] . "','" . $_POST['name'] . "','" . $_POST['cityYears'] . "','" . $_POST['hoodYears'] . "','false','0')";
-
-
+    var sql2 ='{"type":"Point","coordinates":[' + a.lng + "," + a.lat + "]}'),4326),'" + search_poly + "','" +  timeConvert(unixTime) + "','" + usage + "','" + enteredUsername + "','" + a.lat + "','" + a.lng +"')";
         var pURL = sql+sql2;
         console.log(pURL)
         //this is the function that will submit the request to proxy. see line 170
         submitToProxy(pURL);
         console.log("Feature has been submitted to the Proxy");
   });
-
   map.removeLayer(drawnItems);
     drawnItems = new L.FeatureGroup();
     console.log("drawnItems has been cleared");
     dialog.dialog("close");
-    alert("You purchased a property!");
 }
 
 
-//don't know what this exactly does at the moment
-function refreshLayer() {
+ function refreshLayer() {
       if (map.hasLayer(cartoDBPoints)) {
         console.log('points number3', cartoDBpoints);
         map.removeLayer(cartoDBPoints);
       };
       getGeoJSON();
     };
-
 </script>
 
   </body>

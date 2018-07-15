@@ -12,12 +12,10 @@ html, body, #map {
       width: 100%;
         }
 
-/*#controls {
-  width: 100%;
-  margin: 0 auto;
-  float: left;
-}*/
-
+/*#map {
+  position:absolute;
+}
+*/
 #form {
   margin-top: 5px;
   font-size: 12px;
@@ -34,8 +32,6 @@ html, body, #map {
   width: auto;
   padding: auto;
   margin: auto;
- /* position:absolute;
-  left:0px;
-  top:0px;*/
+ /* position:relative;*/
 
 }

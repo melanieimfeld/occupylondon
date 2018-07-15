@@ -2,19 +2,27 @@
 session_start();
 
 $pageWasRefreshed = isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] === 'max-age=0';
-$NoSearchPolys =5;
 
 //110 is length of points selected
 if($pageWasRefreshed) {
     $_SESSION['token']++;
     //echo $_SESSION['array'][$_SESSION['count']];
-    if ($_SESSION['count']< $NoSearchPolys){
+    $searchPolys = 110;
+    if ($_SESSION['count']<5){
     $_SESSION['count']++;
     } else {
     $_SESSION['count']=0;
     }
   }
 
+if($_POST) { // increasing
+  echo "$_post land is true";
+  //$_SESSION['land']++; // no need for extra variable (preincrement to echo immediately)
+}
+
+//echo $_POST;
+  //echo sizeof($_SESSION['array']);
+  //echo $_SESSION['land'];
 ?>
 
 <!DOCTYPE html>
@@ -51,7 +59,7 @@ if($pageWasRefreshed) {
 
   <body>
     <!-- -----------------the dialog element--------------------- -->
-    <div id="dialog" title="Point Information" style="display:none">     
+    <div id="dialog" title="Point Information">     
       <form>
         <fieldset style="border: none;">
           <ul style="list-style-type: none; padding-left: 0px">
@@ -141,15 +149,6 @@ if($pageWasRefreshed) {
   //counting site visits
    var counter = 0;
    var tokens = document.getElementById('tokens');
-
-   var hStyle = {
-    "stroke":true,
-    "color":"#15a956",//data.rows[i].strokeColor,
-    "weight":4,
-    "opacity":1,
-    "fill":false,
-    "clickable":false
-  }
    // var player = <?php //echo json_encode($_SESSION['number']); ?>;
    // tokens.innerHTML = '<p> you got ' + count + ' tokens and your username is '+ player + '</p>';
 
@@ -163,7 +162,6 @@ if($pageWasRefreshed) {
     //write the SQL query I want to use
     var SQLquery = "SELECT * FROM data_game";
 
-
     //show controls when button 'vacant' is pressed
     function addButtons(){
       console.log(document.getElementById('controls'));
@@ -175,9 +173,7 @@ if($pageWasRefreshed) {
     //get CARTO selection as geoJSON and add to leaflet map
     function getGeoJSON(){
       $.getJSON("https://"+cartoDBusername+".carto.com/api/v2/sql?format=GeoJSON&q="+SQLquery, function(data){
-        //do this with retrieved data
         cartoDBpoints=L.geoJson(data,{
-          style:hStyle,
           pointToLayer: function(feature, latlng){
             var marker = L.marker(latlng);
             marker.bindPopup('' + feature.properties.usage + ' <br> belongs to ' + feature.properties.player1 + ' <br> '+feature.properties.no_falsified+' flagged this as false'+'');
@@ -187,7 +183,6 @@ if($pageWasRefreshed) {
       });
     };
 
-// L.geoJson('+geom+',{style:hStyle}).addTo(map'+rand+');'+
 
     function getRandomArbitrary(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
@@ -215,69 +210,20 @@ if($pageWasRefreshed) {
   });
     });
 
-//----------------this isn't working because of asynchronous!!!----------- 
-//https://www.web-design-talk.co.uk/303/store-ajax-response-jquery/
-    function getSession(){
-      var viewport_id;
-      $.getJSON("./data/points_selected.geojson",{contentType: "application/json; charset=UTF-8"},function(data){
-
-        viewport_id = data.features[session_key].properties.id;
-        //return viewport_id;
-        console.log('viewportID inside', viewport_id);
-        
-    });
-    return viewport_id;
-    }
-
-
-    console.log('viewportID outside', getSession());
+    // console.log('doesnt change', coords2);
 
 //----------------use leaflet.draw to add custom points-----------
 // Create Leaflet Draw Control for the draw tools and toolbox
-// var drawControl = new L.Control.Draw({
-//   draw : {
-//     polygon : false,
-//     polyline : false,
-//     rectangle : false,
-//     circle : false
-//   },
-//   edit : false,
-//   remove: false
-// });
 var drawControl = new L.Control.Draw({
-      position: 'topright',
-      draw:false,
-      edit:false
-      
-    });
-
- // Create Leaflet map object
-var map = L.map('map',{ center: [51.51, -0.10], zoom: 22,zoomControl:false});
-
-//----------------drawing polygons-----------
-  poly = new L.Draw.Polygon(map, {
-      allowIntersection: false,
-      showArea: false,
-      drawError: {
-      color: '#b00b00',
-      timeout: 1000
-    },
-    icon: new L.DivIcon({
-      iconSize: new L.Point(10,10),
-      className: 'leaflet-div-icon leaflet-editing-icon'
-    }),
-    shapeOptions: {
-      stroke: true,
-      color: '#ff0000',
-      weight: 1,
-      opacity: 0.7,
-      fill: true,
-      fillColor: null, //same as color by default
-      fillOpacity: 0.2,
-      clickable: true
-    },
-    guidelineDistance: 5,
-  })
+  draw : {
+    polygon : false,
+    polyline : false,
+    rectangle : false,
+    circle : false
+  },
+  edit : false,
+  remove: false
+});
 
 
 // Boolean global variable used to control visiblity
@@ -290,20 +236,18 @@ var drawnItems = new L.FeatureGroup();
   $('#startBtn').on('click',function(){
     if(controlOnMap == true){
       map.removeControl(drawControl);
-      poly.enable();
       controlOnMap = false;
       console.log('remove control if button is clicked again' + controlOnMap);
     }
     map.addControl(drawControl);
     controlOnMap = true;
-    poly.enable();
     console.log("add control of button is clicked once" + controlOnMap);
     //$('#saveBtn').hide();
   });
 
   $('#deleteBtn').on('click',function(){
     drawnItems.clearLayers();
-    poly.disable();
+    //poly.disable();
     //$('#saveBtn').hide();
   });
 
@@ -321,6 +265,10 @@ var drawnItems = new L.FeatureGroup();
     }
   });
 
+
+
+    // Create Leaflet map object
+    var map = L.map('map',{ center: [51.51, -0.10], zoom: 22,zoomControl:false});
 
     //disable controls
     // zoomControl:false (goes in the above paort)
@@ -463,51 +411,11 @@ function setData() {
 
   // ST_SetSRID(geometry geom, integer srid);
   drawnItems.eachLayer(function(layer){
-    var sql = "INSERT INTO data_game (the_geom,search_polygon,created_at,usage, player1,tokensOfPlayer) VALUES (ST_SetSRID(ST_GeomFromGeoJSON('";
-    
-    //OLD:
-    //var a = layer.getLatLng();
-    //gives you an array of latlngs
-
-    var a = layer._latlngs;
-    console.log('what is a', a);
-    var coords = "";
-    
-    console.log('latlng Arr: length: '+a.length+ " " +a);
-        for (var i = 0; i < a.length; i++) {
-          var lat = (a[i].lat).toFixed(4); // rid of rounding that was there for url length issue during dev
-          var lng = (a[i].lng).toFixed(4); // rid of rounding that was there for url length issue during dev
-          coords += '['+lng + ',' + lat+'],';
-
-          //console.log("my version", coords2);
-        // if(i==a.length-1){
-        //   var lat = (a[0].lat).toFixed(4);
-        //   var lng = (a[0].lng).toFixed(4);
-        //   coords2.push("["+lat,lng+"]");
-        //   coords += '['+lng + ',' + lat+']';
-        // }
-        }
-
-
+    var sql = "INSERT INTO data_game (the_geom,search_polygon,created_at,usage, player1,tokensOfPlayer, latitude,longitude) VALUES (ST_SetSRID(ST_GeomFromGeoJSON('";
+    var a = layer.getLatLng();
     var unixTime = Math.floor(Date.now() / 1000);
     console.log(unixTime);
-
-    //OLD
-    // var sql2 ='{"type":"Point","coordinates":[' + a.lng + "," + a.lat + "]}'),4326),'" + search_poly + "','" +  timeConvert(unixTime) + "','" + usage + "','" + enteredUsername + "','" + token + "','" + a.lat + "','" + a.lng +"')";
-
-    //NEW
-    var sql2 ='{"type":"MultiPolygon","coordinates":[[[' + coords + "]]]}'),4326),'" + search_poly + "','" +  timeConvert(unixTime) + "','" + usage + "','" + enteredUsername + "','" + token +"')";
-
-
-//     $q = "INSERT INTO " . $_POST['table'] . " (the_geom, city, description, name,city_yrs,nbrhd_yrs,flag,loved) VALUES (ST_SetSRID(ST_GeomFromGeoJSON('";
-// if ( $_POST['ext'] != "_point" ){
-//   $q .= '{"type":"MultiPolygon","coordinates":[[[' . $_POST['coords'] . "]]]}'";
-// } else {
-//   $q .= '{"type":"Point","coordinates":' . $_POST['coords'] . "}'";
-// }
-// $q .= "),4326),'". $_POST['city'] ."','" . $_POST['description'] . "','" . $_POST['name'] . "','" . $_POST['cityYears'] . "','" . $_POST['hoodYears'] . "','false','0')";
-
-
+    var sql2 ='{"type":"Point","coordinates":[' + a.lng + "," + a.lat + "]}'),4326),'" + search_poly + "','" +  timeConvert(unixTime) + "','" + usage + "','" + enteredUsername + "','" + token + "','" + a.lat + "','" + a.lng +"')";
         var pURL = sql+sql2;
         console.log(pURL)
         //this is the function that will submit the request to proxy. see line 170
@@ -519,7 +427,6 @@ function setData() {
     drawnItems = new L.FeatureGroup();
     console.log("drawnItems has been cleared");
     dialog.dialog("close");
-    alert("You purchased a property!");
 }
 
 
