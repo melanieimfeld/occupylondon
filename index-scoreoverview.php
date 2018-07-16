@@ -52,38 +52,11 @@ if($pageWasRefreshed) {
   </head>
 
   <body>
-    <!-- -----------------the dialog element--------------------- -->
-    <div id="dialog" title="Property Information" style="display:none">     
-      <form>
-        <fieldset style="border: none;">
-          <ul style="list-style-type: none; padding-left: 0px">
-         <!--    <li><label for="username">Your Name</label></li>
-            <li><input type="text" name="username" id="username" placeholder="Enter your name" class="text ui-widget-content ui-corner-all"></li>
-
-            <li><label for="description">About this Point</label></li>
-            <li><input type="text" name="description" id="description" placeholder="Description for this point" class="text ui-widget-content ui-corner-all"></li> -->
-
-            <li><label for="usage">What would you build here?</label></li>
-            <li><select for="usage" id="usage">
-            <option value="Housing" class="text ui-widget-content ui-corner-all">Affordable Housing</option>
-            <option value="Retail" class="text ui-widget-content ui-corner-all">A shopping temple</option>
-            <option value="Home" class="text ui-widget-content ui-corner-all">My own home</option>
-            <option value="Garden" class="text ui-widget-content ui-corner-all">A community garden</option>
-            <option value="Bar" class="text ui-widget-content ui-corner-all">A pop up bar</option>
-            <option value="School" class="text ui-widget-content ui-corner-all">A school</option>
-            <option value="other" class="text ui-widget-content ui-corner-all">I have another idea</option>
-            </select></li>
-
-          </ul>
-          <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-        </fieldset>
-      </form>
-    </div>
 
 <!------------------------------- Navigation -------------------->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
       <div class="container">
-        <a class="navbar-brand" onclick="addButtons()" value="addbuttons" style="cursor:pointer">VACANT</a>
+        <a class="navbar-brand" onclick="addButtons()" value="addbuttons" style="cursor:pointer">RETURN</a>
         <a class="navbar-brand" onclick="window.location.reload()" style="cursor:pointer">NEXT</a>
         <a id='flag' class="navbar-brand" onclick="addFlag()" style="display:none; cursor:pointer">FLAG</a>
 
@@ -109,7 +82,7 @@ if($pageWasRefreshed) {
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item active">
-              <a class="nav-link" href="index-scoreoverview.php">Score overview
+              <a class="nav-link" href="#">Score overview
                 <span class="sr-only">(current)</span>
               </a>
             </li>
@@ -166,7 +139,7 @@ if($pageWasRefreshed) {
     var SQLquery = "SELECT * FROM data_game";
 
      // Create Leaflet map object
-    var map = L.map('map',{ center: [51.51, -0.10], zoom: 22, zoomControl:false});
+    var map = L.map('map',{ center: [51.51, -0.10], zoom: 18});
 
 
     //show controls when button 'vacant' is pressed
@@ -184,13 +157,11 @@ if($pageWasRefreshed) {
       //get current length of carbd dataframe (=cartodb id) and
       //update this column with current id plus 1
       if (flagged==false){
-      //here again. store a $.getjson command in variable. htf?
-      var id = 46;
-      var sql = "UPDATE data_game SET no_falsified=no_falsified+1 WHERE cartodb_id="+id;
+      var carto = 46;
+      var sql = "UPDATE data_game SET no_falsified=no_falsified+1 WHERE cartodb_id="+carto;
       submitToProxy2(sql);
-      flagged=true;
         alert("you just flagged a falsely classified property");
-      
+      flagged=true;
       } else{
         alert("you can't flag this twice, sorry");
       }
@@ -255,13 +226,7 @@ if($pageWasRefreshed) {
       });
     };
 
-// L.geoJson('+geom+',{style:hStyle}).addTo(map'+rand+');'+
 
-    function getRandomArbitrary(min, max) {
-    return Math.floor(Math.random() * (max - min) + min);
-    }
-
-    console.log('this will be undefined', cartoDBpoints);
     // var random = getRandomArbitrary(0,5);
     // console.log(random);
     var session_key = <?php echo json_encode($_SESSION['array'][$_SESSION['count']]); ?>;
@@ -279,7 +244,7 @@ if($pageWasRefreshed) {
         //console.log('session_key',session_key);
         var coords1 = data.features[session_key].geometry.coordinates[0][0];
         var coords2 = data.features[session_key].geometry.coordinates[0][1];
-        map.panTo(new L.LatLng(coords2,coords1));
+        //map.panTo(new L.LatLng(coords2,coords1));
         // // map.panTo(new L.LatLng(coords2));
   });
     });
@@ -390,11 +355,11 @@ console.log('these are all the items', drawnItems);
 
     //disable controls
     // zoomControl:false (goes in the above paort)
-    map.dragging.disable();
-    map.touchZoom.disable();
-    map.doubleClickZoom.disable();
-    map.scrollWheelZoom.disable();
-    map.boxZoom.disable();
+    // map.dragging.disable();
+    // map.touchZoom.disable();
+    // map.doubleClickZoom.disable();
+    // map.scrollWheelZoom.disable();
+    // map.boxZoom.disable();
 
     // Add Tile Layer basemap
     L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
@@ -481,23 +446,6 @@ var postData = function(url,data){
     });
 }
 
-// var land = function(q){
-//       $.post("index-username.php", { // <--- Enter the path to your callProxy.php file here
-//         //this is the text in post in php!
-//         variable:q
-//       }, function(data) {
-//         console.log(data);
-//       });
-//     };
-
-// var tokenUpdate = function(a){
-//       $.post("index-username.php", { // <--- Enter the path to your callProxy.php file here
-//         //this is the text in post in php!
-//         variable2:a
-//       }, function(data) {
-//         console.log(data);
-//       });
-//     };
 
 function timeConvert(unix){
   var a = new Date(unix * 1000);

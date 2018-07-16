@@ -4,6 +4,7 @@ body {
       padding: 0;
       margin: 0;
       font: 100% 'Oswald', 'Helvetica Neue', Helvetica, sans-serif;
+      color: "#FFFFFF";
       background-color: #9ab973;
       }
 
@@ -12,10 +13,19 @@ html, body, #map {
       width: 100%;
         }
 
+
+.bg-dark {
+background-color: #9ab973;
+}
 /*#map {
   position:absolute;
 }
 */
+
+a:hover { 
+    background-color: #9ab973;
+}
+
 #form {
   margin-top: 5px;
   font-size: 12px;
@@ -34,4 +44,9 @@ html, body, #map {
   margin: auto;
  /* position:relative;*/
 
+}
+
+#dialog{
+  background-color: #9ab973;
+  font: 100% 'Oswald', 'Helvetica Neue', Helvetica, sans-serif;
 }
