@@ -31,6 +31,8 @@ if($pageWasRefreshed) {
 
   <!-- Bootstrap core CSS -->
   <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+ <!--  alternative css: glyphicon works but the rest gets messed up -->
+ <!--  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
 
   <link rel="stylesheet" href="css/leaflet.css" />
   <link rel="stylesheet" href="css/leaflet.draw.css" />
@@ -45,8 +47,11 @@ if($pageWasRefreshed) {
   <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 
   <!-- Bootstrap core JavaScript -->
-  <!-- <script src="vendor/jquery/jquery.min.js"></script> -->
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="js/scores.js"></script>
+   <!-- Bootstrap core JavaScript -->
+<!--   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
 
 </head>
 
@@ -106,7 +111,7 @@ if($pageWasRefreshed) {
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">About</a>
+              <a class="nav-link" href="#">Rules</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="logout.php">Logout</a>
@@ -121,49 +126,79 @@ if($pageWasRefreshed) {
         <div class="col-md-12">
           <h1 class="mt-5"> <?php echo json_encode($_SESSION['username'])?>, DO YOU SEE ANY VACANT LAND?</h1>
         </div>
-        <div class="col-md-2"> Tokens: <?php echo $_SESSION['token']?> </div>
+        <div class="col-md-2"></span> Tokens: <?php echo $_SESSION['token']?> </div>
         <div class="col-md-2" id ="land"> Pioneered Land: <?php echo $_SESSION['land']?> </div>
         <div class="col-md-2" id ="area"> Area: <?php echo $_SESSION['area']?> </div>
-        <div class="col-md-4" id ="flags">i</div>
+        <div class="col-md-4" id ="flags"></div>
+        <div class="col-md-12"> <svg class="chart"></svg></div>
       </div>
     </div>
     <!-- Page Content -->
     <div id="map"></div>
 
-
   </div> <!--/.fluid-container-->
 
   <script>
-  //counting site visits
-  var counter = 0;
+//----------------setting up all variables-----------
+    //counting site visits
+    var counter = 0;
 
-  var hStyle = {
-    "stroke":true,
-    "color":"#15a956",//data.rows[i].strokeColor,
-    "weight":4,
-    "fillOpacity":0.2,
-    "opacity":1,
-    "fill":true,
-    "clickable":true
-  }
+    var hStyle = {
+      "stroke":true,
+      "color":"#15a956",//data.rows[i].strokeColor,
+      "weight":4,
+      "fillOpacity":0.2,
+      "opacity":1,
+      "fill":true,
+      "clickable":true
+    }
 
-//----------------connect to CARTO DB and draw 2 datapoints-----------
-    //add data we created from CARTO
-    //create a global variable, empty
-    var cartoDBpoints = null;  
+    var cartoDBpoints = null;  //create a global variable, empty. stays empty at the moment?
     var cartoDBusername = "melanieimfeld";
-    //get playername
-    var playername = <?php echo json_encode($_SESSION['username']); ?>;
-    //write the SQL query I want to use
-    var SQLquery = "SELECT * FROM data_game";
-    //boolean to check if flagging already occurred or not
-    var flagged = false;
-    // Create Leaflet map object
-    var map = L.map('map',{ center: [51.51, -0.10], zoom: 22, zoomControl:false});
-    //get tokens
-    var token = <?php echo json_encode($_SESSION['token']); ?>;
+    var playername = <?php echo json_encode($_SESSION['username']); ?>;  //get playername
+    var SQLquery = "SELECT * FROM data_game";  //SQL for data overview
+    var flagged = false;   //boolean to check if flagging already occurred or not
+    var token = <?php echo json_encode($_SESSION['token']); ?>;    //get tokens
     var session_key = <?php echo json_encode($_SESSION['array'][$_SESSION['count']]); ?>;
 
+    var map = L.map('map',{ center: [51.51, -0.10], zoom: 22, zoomControl:false}); // Create Leaflet map object
+
+    poly = new L.Draw.Polygon(map, { //setting up the polygon shape
+    allowIntersection: false,
+    showArea: true,
+    drawError: {
+      color: '#15a956',
+      timeout: 1000
+    },
+    shapeOptions: {
+        stroke: true
+      },
+    guidelineDistance: 5,
+    })
+
+    var controlOnMap = false;  // Boolean global variable used to control visiblity
+    var drawnItems = new L.FeatureGroup(); // Create variable for Leaflet.draw features
+
+//------------------------ load scores---------------------
+    setInterval(getScores(),5000); //update getScores ever 5 seconds
+
+//------------------------ load map on load---------------------
+  $(document).ready(function() {
+    $("#flag").hide();
+    getGeoJSON();
+        //get points
+    $.getJSON("./data/points_selected.geojson",{contentType: "application/json; charset=UTF-8"},function(data){
+        // add GeoJSON layer to the map once the file is loaded
+        //console.log('pointsselected',data.features[session_key].geometry.coordinates[0][0]);
+        //console.log('length',data.features.length);
+        console.log('hello?',session_key);
+        var coords1 = data.features[session_key].geometry.coordinates[0][0];
+        var coords2 = data.features[session_key].geometry.coordinates[0][1];
+        map.panTo(new L.LatLng(coords2,coords1));
+    });
+  });
+
+//------------------------ Functions---------------------
     //show controls when button 'vacant' is pressed
     function addButtons(){
       console.log(document.getElementById('controls'));
@@ -171,8 +206,6 @@ if($pageWasRefreshed) {
       //$.post("index-username.php", {"update": 10});
       //document.getElementById('controls').style.display = "block";
     }
-
-        
 
     function getColor(d) {
       return d == 'Affordable Housing' ? '#d73027' :
@@ -193,30 +226,25 @@ if($pageWasRefreshed) {
       }
 
 
-//------------------------ LOAD ALL LAND ---------------------
+//------------------------ Function to load map ---------------------
     //get CARTO selection as geoJSON and add to leaflet map
     function getGeoJSON(){
       $.getJSON("https://"+cartoDBusername+".carto.com/api/v2/sql?format=GeoJSON&q="+SQLquery, function(data){
 
-  
-
-
-         // //this is not correct yet. just takes any flag?
-         //    var flags = 0;
-         //    if (feature.properties.player1 == playername){
-         //      flags ++
-         //      //flags = flags + feature.properties.no_falsified
-         //    }
-         //    console.log('these are the total flags', flags);
- 
+        var flags2 = 0;
 
         //if polygons:
         //http://leaflet.github.io/Leaflet.label/
         cartoDBpoints=L.geoJson(data, {
           style:hStyle,
           onEachFeature: function(feature, layer) {
-            $('#flags').text('Flags: '+ flags);
-            
+
+          //count flags of current player
+          if(layer.feature.properties.player1 === playername){
+            console.log('flags', layer.feature.properties.no_falsified);
+            flags2 = flags2 + layer.feature.properties.no_falsified
+          }
+
             //this happens on each feature when flag is clicked
             layer.on('click', function () {
               $("#flag").show(300);
@@ -314,7 +342,9 @@ if($pageWasRefreshed) {
             layer.bindPopup('<b>Discovered by:</b> ' + feature.properties.player1 + '<br> <b>Area:</b> ' + feature.properties.area + '<br><b>Acquired by:</b> ' + feature.properties.bought_by + '<br><b>Bid for:</b> '+ feature.properties.bid_for + '<br> '+feature.properties.no_falsified+' flagged this as false'+'');
           }
         }).addTo(map);
-
+        
+      console.log('array',flags2);
+      $('#flags').text('Flags: '+ flags2);
       });
 };
 
@@ -323,60 +353,15 @@ function getRandomArbitrary(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
+
 console.log('this will be undefined', cartoDBpoints);
 console.log('sessionkey', session_key);
-
-    //run above function when document loads
-    $(document).ready(function() {
-      $("#flag").hide();
-      getGeoJSON();
-        //get points
-        $.getJSON("./data/points_selected.geojson",{contentType: "application/json; charset=UTF-8"},function(data){
-          var coords1 = data.features[session_key].geometry.coordinates[0][0];
-          var coords2 = data.features[session_key].geometry.coordinates[0][1];
-          map.panTo(new L.LatLng(coords2,coords1));
-        // // map.panTo(new L.LatLng(coords2));
-      });
-      });
-
 
     var drawControl = new L.Control.Draw({
       position: 'topright',
       draw:false,
       edit:false     
     });
-
-//----------------drawing polygons-----------
-poly = new L.Draw.Polygon(map, {
-  allowIntersection: false,
-  showArea: true,
-  drawError: {
-    color: '#15a956',
-    timeout: 1000
-  },
-    // icon: new L.DivIcon({
-    //   iconSize: new L.Point(10,10),
-    //   className: 'leaflet-div-icon leaflet-editing-icon'
-    // }),
-    shapeOptions: {
-      stroke: true,
-      // color: '#ff0000',
-      // weight: 1,
-      // opacity: 0.7,
-      // fill: true,
-      // fillColor: null, //same as color by default
-      // fillOpacity: 0.2,
-      // clickable: true
-    },
-    guidelineDistance: 5,
-  })
-
-
-// Boolean global variable used to control visiblity
-var controlOnMap = false;
-
-// Create variable for Leaflet.draw features
-var drawnItems = new L.FeatureGroup();
 
 
 $('#startBtn').on('click',function(){

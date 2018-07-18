@@ -44,6 +44,8 @@ if($pageWasRefreshed) {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
    <!--  <script src='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.js'></script> -->
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="js/scores.js"></script>
 
        <!-- Bootstrap core JavaScript -->
     <!-- <script src="vendor/jquery/jquery.min.js"></script> -->
@@ -97,16 +99,17 @@ if($pageWasRefreshed) {
       </div>
     </nav>
 <!--------------------- this is the container with land and tokens ----------------------->  
-     <!--  <div class="container-fluid" style="pointer-events: none">
-        <div class="row">
-          <div class="col-md-12">
-            <h1 class="mt-5"> <?php echo $_SESSION['username']?> DO YOU SEE ANY VACANT LAND?</h1>
-          </div>
-          <div class="col-md-2">Tokens: <?php echo $_SESSION['token']?></div>
-          <div class="col-md-10" id ="land">Land: <?php echo $_SESSION['land']?></div>
+     <div class="container-fluid" style="pointer-events: none">
+      <div class="row">
+        <div class="col-md-12">
+          <h1 class="mt-5">SCORE OVERVIEW</h1>
         </div>
-      </div> -->
-    <!-- Page Content -->
+         <div class="col-md-12">
+          <svg class="chart"></svg>
+        </div>
+      </div>
+    </div>
+
  <div id="map"></div>
 
 
@@ -142,6 +145,8 @@ if($pageWasRefreshed) {
      // Create Leaflet map object
     var map = L.map('map',{ center: [51.5310, 0.1007], zoom: 15});
 
+    //update getScores ever 5 seconds
+    setInterval(getScores(),5000);
 
     //show controls when button 'vacant' is pressed
     function addButtons(){
@@ -169,6 +174,7 @@ if($pageWasRefreshed) {
       //console.log(postData(sql));
     }
 
+
     //get CARTO selection as geoJSON and add to leaflet map
     function getGeoJSON(){
       $.getJSON("https://"+cartoDBusername+".carto.com/api/v2/sql?format=GeoJSON&q="+SQLquery, function(data){
@@ -177,7 +183,7 @@ if($pageWasRefreshed) {
         return {
               'color': getColor(feature.properties.usage)
           };
-        }
+        };
 
 
       function getColor(d) {
@@ -190,13 +196,20 @@ if($pageWasRefreshed) {
                  d == 'A community garden'  ? '#4d9221' :
                  d == 'I have another idea'  ? '#a7b000' :
                             '#f5f635';
-          
-      }
-        //if polygons:
-        //http://leaflet.github.io/Leaflet.label/
+      };
+
         cartoDBpoints=L.geoJson(data, {
           style:hStyle,
           onEachFeature: function(feature, layer) {
+
+          
+            //for each player, make summary stats
+            // for (var i=0;i<names.length;i++){
+            //   if (names[i] = layer.feature.properties.player1){
+            //       //var area = area + layer.feature.properties.area;
+            //       //scores.push(area);
+            //   }
+            // }
             
             layer.on('click', function () {
               $("#flag").show(300);
@@ -212,18 +225,6 @@ if($pageWasRefreshed) {
             layer.bindPopup('' + feature.properties.usage + ' <br> belongs to ' + feature.properties.player1 + ' <br> '+feature.properties.no_falsified+' flagged this as false'+'');
           }
         }).addTo(map);
-
-//         label = new L.Label()
-// label.setContent("static label")
-// label.setLatLng(polygon.getBounds().getCenter())
-// map.showLabel(label);
-
-        //trying stuff:
-        // L.geoJson(data, {
-        //   onEachFeature: function(feature, layer) {
-        //   layer.bindLabel(feature.properties.player1, { 'noHide': true });
-        //   }
-        // })
   
       });
     };
@@ -446,7 +447,7 @@ var postData = function(url,data){
     data, function(d) {
       //console.log(d);
     });
-}
+};
 
 
 function timeConvert(unix){
@@ -459,7 +460,7 @@ function timeConvert(unix){
   var sec = a.getSeconds();
   var time = year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec ;
   return time;
-}
+};
 
 //polygon: {"type": "Polygon","coordinates": [[ [100.0, 0.0], [101.0, 0.0], [101.0, 1.0],[100.0, 1.0], [100.0, 0.0] ] ]}
 // var player = <?php //echo json_encode($_SESSION['username']); ?>;
@@ -504,9 +505,6 @@ function setData() {
     var unixTime = Math.floor(Date.now() / 1000);
     console.log(unixTime);
 
-    //OLD
-    // var sql2 ='{"type":"Point","coordinates":[' + a.lng + "," + a.lat + "]}'),4326),'" + search_poly + "','" +  timeConvert(unixTime) + "','" + usage + "','" + enteredUsername + "','" + token + "','" + a.lat + "','" + a.lng +"')";
-
     //NEW
     var sql2 ='{"type":"MultiPolygon","coordinates":[[[' + coords + "]]]}'),4326),'" + search_poly + "','" +  timeConvert(unixTime) + "','" + usage + "','" + enteredUsername + "','" + token +"')";
 
@@ -522,7 +520,7 @@ function setData() {
     console.log("drawnItems has been cleared");
     dialog.dialog("close");
     alert("You purchased a property!");
-}
+};
 
 //if post was sent new data is loaded
 function refreshLayer() {
@@ -532,6 +530,7 @@ function refreshLayer() {
       };
       getGeoJSON();
     };
+
 
 </script>
 

@@ -8,7 +8,7 @@ if ($_POST) {
   $_SESSION['username'] = $_POST["enteredName"];
  
   //update scores
-  $_SESSION['token'] = $_SESSION['token']-$_POST["variable2"];
+  $_SESSION['token'] = $_SESSION['token']- $_POST["variable2"];
   $_SESSION['land'] = $_SESSION['land']+$_POST["variable1"];
   $_SESSION['area'] = $_SESSION['area']+$_POST["variable3"];
 
