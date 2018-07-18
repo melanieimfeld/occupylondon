@@ -1,21 +1,21 @@
-@import url(http://fonts.googleapis.com/css?family=Oswald);
+@import url(https://fonts.googleapis.com/css?family=Roboto);
 
 body {
       padding: 0;
       margin: 0;
-      font: 100% 'Oswald', 'Helvetica Neue', Helvetica, sans-serif;
-      color: "#FFFFFF";
-      background-color: #9ab973;
+      font: 100% 'Roboto', 'Helvetica Neue', Helvetica, sans-serif;
+      background-color: #faccc6;
       }
 
 html, body, #map {
       height: 100%;
       width: 100%;
+      color: #f05742 !important;
         }
 
 
 .bg-dark {
-background-color: #9ab973;
+background-color: #faccc6 !important;
 }
 /*#map {
   position:absolute;
@@ -23,7 +23,7 @@ background-color: #9ab973;
 */
 
 a:hover { 
-    background-color: #9ab973;
+    background-color: #f48171;
 }
 
 #form {
@@ -33,6 +33,7 @@ a:hover {
   line-height: 16px;
   width:375px;
   float: left;
+  font: 100% 'Oswald', 'Helvetica Neue', Helvetica, sans-serif !important;
 }
 
 
@@ -47,6 +48,20 @@ a:hover {
 }
 
 #dialog{
-  background-color: #9ab973;
+  background-color: #faccc6;
+  font: 100% 'Oswald', 'Helvetica Neue', Helvetica, sans-serif !important;
+}
+
+
+.leaflet-popup-content-wrapper {
   font: 100% 'Oswald', 'Helvetica Neue', Helvetica, sans-serif;
+}
+
+.leaflet-popup-content-wrapper .leaflet-popup-content {
+  font: 100% 'Oswald', 'Helvetica Neue', Helvetica, sans-serif;
+}
+
+/*in theory should get rid of all blue lines when item is clicked*/
+input:focus {
+    outline:none !important;
 }

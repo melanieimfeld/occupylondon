@@ -38,7 +38,7 @@ if($pageWasRefreshed) {
     <link rel="stylesheet" type="text/css" href="css/style.css">
 
     <script src="js/leaflet.js"></script>
-    <script src="js/leaflet.label.js"></script>
+<!--     <script src="js/leaflet.label.js"></script> -->
 <!--     <script src="js/leaflet.draw.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
@@ -56,9 +56,9 @@ if($pageWasRefreshed) {
 <!------------------------------- Navigation -------------------->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
       <div class="container">
-        <a class="navbar-brand" onclick="addButtons()" value="addbuttons" style="cursor:pointer">RETURN</a>
-        <a class="navbar-brand" onclick="window.location.reload()" style="cursor:pointer">NEXT</a>
-        <a id='flag' class="navbar-brand" onclick="addFlag()" style="display:none; cursor:pointer">FLAG</a>
+        <a class="navbar-brand" href="map.php" style="cursor:pointer">RETURN</a>
+      <!--   <a class="navbar-brand" onclick="window.location.reload()" style="cursor:pointer">NEXT</a>
+        <a id='flag' class="navbar-brand" onclick="addFlag()" style="display:none; cursor:pointer">FLAG</a> -->
 
         <!-- <a class="navbar-brand" href="?inc=TRUE">Increment</a> -->
 
@@ -97,7 +97,7 @@ if($pageWasRefreshed) {
       </div>
     </nav>
 <!--------------------- this is the container with land and tokens ----------------------->  
-      <div class="container-fluid" style="pointer-events: none">
+     <!--  <div class="container-fluid" style="pointer-events: none">
         <div class="row">
           <div class="col-md-12">
             <h1 class="mt-5"> <?php echo $_SESSION['username']?> DO YOU SEE ANY VACANT LAND?</h1>
@@ -105,7 +105,7 @@ if($pageWasRefreshed) {
           <div class="col-md-2">Tokens: <?php echo $_SESSION['token']?></div>
           <div class="col-md-10" id ="land">Land: <?php echo $_SESSION['land']?></div>
         </div>
-      </div>
+      </div> -->
     <!-- Page Content -->
  <div id="map"></div>
 
@@ -121,7 +121,8 @@ if($pageWasRefreshed) {
     "stroke":true,
     "color":"#15a956",//data.rows[i].strokeColor,
     "weight":4,
-    "opacity":0.5,
+    "fillOpacity":0.2,
+    "opacity":1,
     "fill":true,
     "clickable":true
   }
@@ -139,7 +140,7 @@ if($pageWasRefreshed) {
     var SQLquery = "SELECT * FROM data_game";
 
      // Create Leaflet map object
-    var map = L.map('map',{ center: [51.51, -0.10], zoom: 18});
+    var map = L.map('map',{ center: [51.5310, 0.1007], zoom: 15});
 
 
     //show controls when button 'vacant' is pressed
@@ -180,15 +181,16 @@ if($pageWasRefreshed) {
 
 
       function getColor(d) {
-          return d == 'Affordable Housing' ? '#f7fcf0' :
-                 d == 'A pop up bar'  ? '#e0f3db' :
-                 d == 'My own home'  ? '#ccebc5' :
-                 d == 'A shopping temple'  ? '#a8ddb5' :
-                 d == 'A grocery store'  ? '#7bccc4' :
-                 d == 'A school'  ? '#4eb3d3' :
-                 d == 'A community garden'  ? '#2b8cbe' :
-                 d == 'I have another idea'  ? '#0868ac' :
-                            '#084081';
+        return d == 'Affordable Housing' ? '#d73027' :
+                 d == 'A pop up bar'  ? '#f46d43' :
+                 d == 'My own home'  ? '#fdae61' :
+                 d == 'A shopping temple'  ? '#fee090' :
+                 d == 'A grocery store'  ? '#74add1' :
+                 d == 'A school'  ? '#4575b4' :
+                 d == 'A community garden'  ? '#4d9221' :
+                 d == 'I have another idea'  ? '#a7b000' :
+                            '#f5f635';
+          
       }
         //if polygons:
         //http://leaflet.github.io/Leaflet.label/

@@ -6,5 +6,5 @@ session_destroy();
   
 //redirect to login page
 echo "All session variables are now removed, and the session is destroyed." ;
-header("Location: index-username.php");
+header("Location: index.php");
 ?>
