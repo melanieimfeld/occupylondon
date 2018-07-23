@@ -100,7 +100,8 @@ function randCol($minVal = 0, $maxVal = 255)
         <form method="post">
         enter your playername: <br>
         <input type="text" name="enteredName" required><br>
-        <input type="submit">
+        <!-- <input type="submit"> -->
+        <button type="submit" class="btn btn-primary">START</button>
         </form>
     </div>
   </div>

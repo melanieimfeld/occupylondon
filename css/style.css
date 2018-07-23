@@ -59,9 +59,9 @@ background-color: #faccc6 !important;
 
 .leaflet-popup-content-wrapper {
   font: 100% 'Oswald', 'Helvetica Neue', Helvetica, sans-serif;
-  display: flex !important;
+  /*display: flex !important;
   justify-content: center !important;
-  text-align:center;
+  text-align:center;*/
 
 }
 
@@ -131,4 +131,14 @@ background-color: #faccc6 !important;
   padding: 0.1rem;
   vertical-align: top;
   border-top: 1px solid #f05742;
+}
+
+.modal-header {
+  display: inline-block !important;
+}
+
+#modalbody{
+  -webkit-column-count: 2; /* Chrome, Safari, Opera */
+  -moz-column-count: 2; /* Firefox */
+  column-count: 2;
 }

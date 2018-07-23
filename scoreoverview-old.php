@@ -36,7 +36,6 @@ if($pageWasRefreshed) {
     <link rel="stylesheet" href="css/leaflet.draw.css" />
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
-     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">
 
     <script src="js/leaflet.js"></script>
 <!--     <script src="js/leaflet.label.js"></script> -->
@@ -86,25 +85,25 @@ if($pageWasRefreshed) {
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title"><i class="fas fa-building"></i>  Secure your lot by building</h4>
+          <h4 class="modal-title">Modal Header</h4>
         </div>
-        <div class="modal-body" id="modalbody">
-            <p>You can secure your lot from being bought by others by building something on it. Only the options that fulfil the area requirements are shown. Keep in mind your tokencount.</p>
+        <div class="modal-body">
         <!-- tryin to put a dropdown in the modal. on submit, send the content to xx --> 
         <!-- <form name="searchForm" id="searchForm" method="POST" action="php/build.php"> -->
             <input type="hidden" name="selection" id="buildInput"> 
             <div class="dropdown">
-              <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Building options
-              <span class="caret"></span></button>
-              <input id="search_type" name="search_type" type="hidden">
-              <ul class="dropdown-menu" id="dropdownBuild">
-              </ul>
-            </div>
+            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Dropdown Example
+            <span class="caret"></span></button>
+            <input id="search_type" name="search_type" type="hidden">
+            <ul class="dropdown-menu" id="dropdownBuild">
+            </ul>
+          </div>
+        <!-- </form>  -->
         <!-- end of dropdown -->
         </div>
         <div class="modal-footer">
-          <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Cancel</button>
-          <button id="allSubmitBtn" class="btn btn-primary">Build!</button>
+          <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+          <button id="allSubmitBtn" class="btn btn-success">Save Neighborhood!</button>
         </div>
       </div>
       
@@ -333,8 +332,8 @@ console.log('clientwidth', width);
 
 
 //---------------------------This is the entire building selection--------------------
-             layer.on('click', function (){
-              $("#myModal").modal('show');
+            layer.on('click', function (){
+              console.log('what is the layer',layer);
               //create list dynamically.
               var list = document.getElementById('dropdownBuild');
               //var firstname = document.getElementById('firstname').value;
@@ -343,21 +342,10 @@ console.log('clientwidth', width);
               for (var k in buildings){
                 if (buildings[k] >= feature.properties.area){
                   var entry = document.createElement('li');
-                  entry.style.cursor = 'pointer';
                   entry.appendChild(document.createTextNode(k));
                   list.appendChild(entry);
                 }
               }
-
-              if (feature.properties.area > 4000) {
-                  //$("#dropdownBuild").remove();
-                  console.log('hello?');
-                  var entry = document.createElement('p');
-                  entry.appendChild(document.createTextNode('no building fits'));
-                  //list.appendChild(entry);
-              }
-
-              console.log('check list',list.childNodes.length);
 
               var selText;
               var globalX = feature.properties.cartodb_id;
@@ -366,42 +354,47 @@ console.log('clientwidth', width);
                 console.log('value selected', selText);
                 //$(this).parents('.btn-group').find('.dropdown-toggle').html(selText+'<span class="caret"></span>');
                 $("#allSubmitBtn").click(function(e){
-                  var sql ="UPDATE data_game SET usage='"+selText+"', secured="+false+" WHERE cartodb_id="+globalX;
+                  var sql ="UPDATE data_game SET usage='"+selText+"', secured="+true+" WHERE cartodb_id="+globalX;
                   console.log(sql)
                   //this is the function that will submit the request to proxy. see line 170
                   submitToProxy(sql);
                   $("#myModal").modal('hide');
-                  $("#dropdownBuild").children().remove();
-                  console.log('this is the list', list);
                 });
               });
 
-                $('#myModal').on('hidden.bs.modal', function () {
-                   $("#dropdownBuild").children().remove();
-                  console.log('this is the list when closed', list);
-              })
+                // $(".leaflet-popup-close-button")[0].click( function(){
+                //   $("#dropdownBuild").children().remove();
+                
+                // });
+
+                // $(".marker-delete-button:visible").click(function () {
+                //    console.log('happens when button is clicked', list);
+                //   $("#dropdownBuild").children().remove();
+                // });
+
+              console.log('this is the list', list);
 
             });
 
+
 //---------------------------popup container--------------------
-            // var container = $('<div />');
-            // var label = L.marker(layer.getBounds().getCenter());
-            // var data = createList();
+            var container = $('<div />');
+            var label = L.marker(layer.getBounds().getCenter());
 
-            // console.log('this is the list', data);
 
-            // // Insert whatever you want into the container, using whichever approach you prefer
-            // container.html("Area: "+feature.properties.area+" Used as: "+feature.properties.usage+" <input type='hidden' name='selection' id='buildInput'> <div class='dropdown'> <button class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown'>Build something<span class='caret'></span></button><input id='search_type' name='search_type' type='hidden'><ul class='dropdown-menu' id='dropdownBuild'></ul>" );
-       
+            // Insert whatever you want into the container, using whichever approach you prefer
+            container.html("Area: "+feature.properties.area+" Used as: "+feature.properties.usage+" <button type='button' class='btn btn-primary' title='build something' data-toggle='modal' data-target='#myModal'>Build now!</button>.");
+            //container.append($('<span class="bold">').text(" :)"))
 
-            // // Insert the container into the popup
-            // layer.bindPopup(data);
+            // Insert the container into the popup
+            layer.bindPopup(container[0]);
 
           }
         }
       }).addTo(map);
 
- 
+          
+
   
     });
   
