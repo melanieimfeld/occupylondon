@@ -5,9 +5,12 @@ ini_set('display_errors',1);
 
 session_start();
 
-$_SESSION['count'] = 0;
+$_SESSION['count']=0;
+$_SESSION['token']=0;
+$_SESSION['land']=0;
+$_SESSION['area']=0;
 
-//if username has been posted
+//if anything was submitted
 if ($_POST) {
   //currently, username doesn't allow quotation marks. throws error
   $name = $_POST["enteredName"];
@@ -22,6 +25,7 @@ if ($_POST) {
 
   //numbers are not recognized and true is returned
   if (!in_array($name ,$return)){
+    echo 'name in array';
     //echo var_dump($return);
     //assign existing color
     $_SESSION['usercolor'] = $return["rows"][0]["playercolor"];
@@ -35,7 +39,7 @@ if ($_POST) {
       //create an array and shuffle it for each user once
     $_SESSION['array'] = range(0,109);
     shuffle($_SESSION['array']);
-    header("Location: map.php");
+    header("Location: map.php"); die();
 
   } else {
     //echo var_dump($return);
@@ -44,17 +48,17 @@ if ($_POST) {
     $_SESSION['usercolor'] = randCol(100,255);
     $_SESSION['username'] = $name;
     //update scores
-    $_SESSION['token'] = $_SESSION['token']- $_POST["variable2"];
+    $_SESSION['token'] = $_SESSION['token']-$_POST["variable2"];
     $_SESSION['land'] = $_SESSION['land']+$_POST["variable1"];
     $_SESSION['area'] = $_SESSION['area']+$_POST["variable3"];
       //create an array and shuffle it for each user once
     $_SESSION['array'] = range(0,109);
     shuffle($_SESSION['array']);
-    header("Location: map.php");
+    header("Location: map.php"); die();
   }
  
 } else {
-  $_SESSION['username'] = "";
+  //$_SESSION['username'] = $name;
   $_SESSION['token']=0;
   $_SESSION['land']=0;
   $_SESSION['area']=0;
@@ -101,7 +105,7 @@ function randCol($minVal = 0, $maxVal = 255)
         enter your playername: <br>
         <input type="text" name="enteredName" required><br>
         <!-- <input type="submit"> -->
-        <button type="submit" class="btn btn-primary">START</button>
+        <button type="submit" href="map.php" class="btn btn-primary">START</button>
         </form>
     </div>
   </div>

@@ -11,7 +11,7 @@ if (empty($_SESSION['username'])){
 
 //110 is length of points selected
 if($pageWasRefreshed) {
-  $_SESSION['token']++;
+  //$_SESSION['token']++;
     //echo $_SESSION['array'][$_SESSION['count']];
   if ($_SESSION['count']< $NoSearchPolys){
     $_SESSION['count']++;
@@ -126,7 +126,7 @@ if($pageWasRefreshed) {
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
       <div class="container">
         <button type="button" onclick="addButtons()" class="navbar-brand"><i class="fas fa-tree"></i> VACANT</button>
-        <button type="button" onclick="window.location.reload()" class="btn btn-danger"><i class="fas fa-arrow-up"></i> SPOT ANOTHER</button>
+        <button type="button" onclick="tokenOnReload()" class="btn btn-danger"><i class="fas fa-arrow-up"></i> SPOT ANOTHER</button>
         <button type="button" href="scoreoverview.php" class="btn btn-danger"><i class="fas fa-building"></i> BUILD</button>
   
         <a id='flag' class="navbar-brand" style="display:none; cursor:pointer">FLAG</a>
@@ -240,7 +240,7 @@ if($pageWasRefreshed) {
 
 
 //------------------------ load scores---------------------
-    setInterval(getScores(),5000); //update getScores ever 5 seconds
+    //setInterval(getScores,5000, console.log('doesthiswork')); //update getScores ever 5 seconds. doesn't work?
 
 
 //------------------------ Functions---------------------
@@ -275,6 +275,15 @@ if($pageWasRefreshed) {
           'color': getColor(feature.properties.usage)
         };
       }
+
+    //doesn't work at the moment. 
+    function tokenOnReload(){
+      postData( "index.php", {
+      variable2: -1,
+      enteredName: playername
+      });
+      location.reload(); 
+    }
 
 
 //------------------------ Function to load map ---------------------
