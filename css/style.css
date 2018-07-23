@@ -1,8 +1,8 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto);
 
 body {
-      padding: 0;
-      margin: 0;
+      /*padding: 0;
+      margin: 0;*/
       font: 100% 'Roboto', 'Helvetica Neue', Helvetica, sans-serif;
       background-color: #faccc6;
       }
@@ -14,6 +14,11 @@ html, body, #map {
         }
 
 
+/*#map2 {
+      height: 100%;
+      width: 100%;
+      }*/
+
 .bg-dark {
 background-color: #faccc6 !important;
 }
@@ -22,9 +27,9 @@ background-color: #faccc6 !important;
 }
 */
 
-a:hover { 
+/*a:hover { 
     background-color: #f48171;
-}
+}*/
 
 #form {
   margin-top: 5px;
@@ -52,19 +57,23 @@ a:hover {
   font: 100% 'Oswald', 'Helvetica Neue', Helvetica, sans-serif !important;
 }
 
-
 .leaflet-popup-content-wrapper {
   font: 100% 'Oswald', 'Helvetica Neue', Helvetica, sans-serif;
+  display: flex !important;
+  justify-content: center !important;
+  text-align:center;
+
 }
 
 .leaflet-popup-content-wrapper .leaflet-popup-content {
   font: 100% 'Oswald', 'Helvetica Neue', Helvetica, sans-serif;
+  text-align:center;
 }
 
 /*in theory should get rid of all blue lines when item is clicked*/
-input:focus {
+/*input:focus {
     outline:none !important;
-}
+}*/
 
 
 .icon {
@@ -73,4 +82,53 @@ input:focus {
     width: 10px;
     display: inline-block;
     /* Other styles here */
+}
+
+.chart {
+  padding-top:1em;
+/*  padding-bottom:1em;*/
+ /* overflow:hidden;*/
+}
+
+/*.leaflet-container {
+    background-color:rgba(255,0,0,0.0);
+}*/
+
+/*ul{
+    
+    list-style-type: none;
+    padding-left:0;
+    float: left;
+    column-count: 2;
+  }
+*/
+.svg-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* aspect ratio */
+    vertical-align: top;
+    overflow: hidden;
+}
+.svg-content-responsive {
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    left: 0;
+}
+
+.btn {
+/*  margin: 0 auto !important;*/
+}
+
+.table {
+  margin-bottom: 0rem;
+/*  margin: 0 auto !important;*/
+}
+
+.table th,
+.table td {
+  padding: 0.1rem;
+  vertical-align: top;
+  border-top: 1px solid #f05742;
 }

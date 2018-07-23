@@ -4,6 +4,11 @@ session_start();
 $pageWasRefreshed = isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] === 'max-age=0';
 $NoSearchPolys =5;
 
+//if no username was defined send user back to login page
+if (empty($_SESSION['username'])){
+   header("Location: index.php");
+}
+
 //110 is length of points selected
 if($pageWasRefreshed) {
   $_SESSION['token']++;
@@ -15,19 +20,21 @@ if($pageWasRefreshed) {
   }
 }
 
+#echo $_SESSION['usercolor'];
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
+<!-- //https://codepen.io/mfritsch/pen/VYdeEE -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>Settlers of London</title>
+  <title>Spot-a-lot</title>
 
   <!-- Bootstrap core CSS -->
   <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
@@ -38,6 +45,7 @@ if($pageWasRefreshed) {
   <link rel="stylesheet" href="css/leaflet.draw.css" />
   <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
   <link rel="stylesheet" type="text/css" href="css/style.css"/>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">
 
   <script src="js/leaflet.js"></script>
   <!--     <script src="js/leaflet.draw.js"></script> -->
@@ -89,7 +97,8 @@ if($pageWasRefreshed) {
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
       <div class="container">
         <a class="navbar-brand" onclick="addButtons()" value="addbuttons" style="cursor:pointer">VACANT</a>
-        <a class="navbar-brand" onclick="window.location.reload()" style="cursor:pointer">NEXT</a>
+        <a class="navbar-brand" onclick="window.location.reload()" style="cursor:pointer">SPOT ANOTHER</a>
+        <a class="navbar-brand" style="cursor:pointer"><i class="fas fa-arrow-up"></i> BUILD</a>
         <a id='flag' class="navbar-brand" style="display:none; cursor:pointer">FLAG</a>
         <a id='acquire' class="navbar-brand" style="display:none; cursor:pointer">ACQUIRE ME</a>
 
@@ -124,13 +133,13 @@ if($pageWasRefreshed) {
     <div class="container-fluid" style="pointer-events: none">
       <div class="row">
         <div class="col-md-12">
-          <h1 class="mt-5"> <?php echo json_encode($_SESSION['username'])?>, DO YOU SEE ANY VACANT LAND?</h1>
+          <h1 class="mt-3"> <?php echo json_encode($_SESSION['username'])?>, SPOT A VACANT LOT!</h1>
         </div>
         <div class="col-md-2"></span> Tokens: <?php echo $_SESSION['token']?> </div>
         <div class="col-md-2" id ="land"> Pioneered Land: <?php echo $_SESSION['land']?> </div>
         <div class="col-md-2" id ="area"> Area: <?php echo $_SESSION['area']?> </div>
         <div class="col-md-4" id ="flags"></div>
-        <div class="col-md-12"> <svg class="chart"></svg></div>
+        <div class="col-md-12" id="chart1"> <svg class="chart"></svg></div>
       </div>
     </div>
     <!-- Page Content -->
@@ -139,6 +148,15 @@ if($pageWasRefreshed) {
   </div> <!--/.fluid-container-->
 
   <script>
+
+
+  function stuffToRezie(){
+        var h_window = $(window).height();
+        var h_map = h_window - 125;
+        $('#map').css('height', h_map);
+}
+
+$(window).on("resize", stuffToRezie).trigger('resize'); 
 //----------------setting up all variables-----------
     //counting site visits
     var counter = 0;
@@ -152,16 +170,31 @@ if($pageWasRefreshed) {
       "fill":true,
       "clickable":true
     }
-
+    var map = L.map('map',{ center: [51.51, -0.10], zoom: 22, zoomControl:false}); // Create Leaflet map object
     var cartoDBpoints = null;  //create a global variable, empty. stays empty at the moment?
     var cartoDBusername = "melanieimfeld";
     var playername = <?php echo json_encode($_SESSION['username']); ?>;  //get playername
+    var playercolor = <?php echo json_encode($_SESSION['usercolor']); ?>;  //get playercolor
     var SQLquery = "SELECT * FROM data_game";  //SQL for data overview
     var flagged = false;   //boolean to check if flagging already occurred or not
     var token = <?php echo json_encode($_SESSION['token']); ?>;    //get tokens
     var session_key = <?php echo json_encode($_SESSION['array'][$_SESSION['count']]); ?>;
-
-    var map = L.map('map',{ center: [51.51, -0.10], zoom: 22, zoomControl:false}); // Create Leaflet map object
+    var session_array = <?php echo json_encode($_SESSION['array']); ?>;
+    var controlOnMap = false;  // Boolean global variable used to control visiblity
+    var drawnItems = new L.FeatureGroup(); // Create variable for Leaflet.draw features
+   
+    window.onresize = function() {
+       var width = document.getElementById('map').clientWidth;
+       console.log('flexwidth', width);
+    };
+    
+   
+   // Add Tile Layer basemap
+    L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 18,
+      subdomains:['mt0','mt1','mt2','mt3']
+    }).addTo(map);
 
     poly = new L.Draw.Polygon(map, { //setting up the polygon shape
     allowIntersection: false,
@@ -176,27 +209,10 @@ if($pageWasRefreshed) {
     guidelineDistance: 5,
     })
 
-    var controlOnMap = false;  // Boolean global variable used to control visiblity
-    var drawnItems = new L.FeatureGroup(); // Create variable for Leaflet.draw features
 
 //------------------------ load scores---------------------
     setInterval(getScores(),5000); //update getScores ever 5 seconds
 
-//------------------------ load map on load---------------------
-  $(document).ready(function() {
-    $("#flag").hide();
-    getGeoJSON();
-        //get points
-    $.getJSON("./data/points_selected.geojson",{contentType: "application/json; charset=UTF-8"},function(data){
-        // add GeoJSON layer to the map once the file is loaded
-        //console.log('pointsselected',data.features[session_key].geometry.coordinates[0][0]);
-        //console.log('length',data.features.length);
-        console.log('hello?',session_key);
-        var coords1 = data.features[session_key].geometry.coordinates[0][0];
-        var coords2 = data.features[session_key].geometry.coordinates[0][1];
-        map.panTo(new L.LatLng(coords2,coords1));
-    });
-  });
 
 //------------------------ Functions---------------------
     //show controls when button 'vacant' is pressed
@@ -233,8 +249,6 @@ if($pageWasRefreshed) {
 
         var flags2 = 0;
 
-        //if polygons:
-        //http://leaflet.github.io/Leaflet.label/
         cartoDBpoints=L.geoJson(data, {
           style:hStyle,
           onEachFeature: function(feature, layer) {
@@ -252,6 +266,7 @@ if($pageWasRefreshed) {
               console.log('show cartodb id', feature.properties.cartodb_id);
 
               var globalX = feature.properties.cartodb_id;
+              console.log('tis is this cartodbid', globalX);
 
               // add a flag to a property when flag is clicked
               $('#flag').click(function addFlag(){
@@ -259,10 +274,10 @@ if($pageWasRefreshed) {
                 //here again. store a $.getjson command in variable. htf?
                 //var globalX = 46;
                 var update = "UPDATE data_game SET no_falsified=no_falsified+1 WHERE cartodb_id="+globalX;
-                submitToProxy2(update);
+                submitToProxy(update);
                 console.log('show update', update);
-                flagged=true;
                 alert("you just flagged a falsely classified property");
+                flagged=true;
                 console.log('id submitted', globalX);
                 
               } else{
@@ -273,10 +288,11 @@ if($pageWasRefreshed) {
               //acquire property
               $('#acquire').click(function acquire(){
                 //pop up dialog how much do you want to bid? you need to bid at least 1 token. the more you bid, the less likely someone will take over your property.
-                 var currentBid = feature.properties.bid_for + 1;
+                var currentBid = feature.properties.bid_for + 1;
 
                 document.getElementById('spinnerLabel').innerHTML = "If you want to acquire this land, you need your minimum bid is " + currentBid + " ."; 
 
+                //problem: if page gets refreshed you ALWAYS gain 1 token that means your purchase is + 1. you should only gain tokens when you refresh without action.
                 function submitPurchase() {
                 var area = feature.properties.area;
                 var bid = document.getElementById("spinner").value;
@@ -288,20 +304,25 @@ if($pageWasRefreshed) {
 
                 //conditions: larger than token size. larger than mimium amount. non negative number.
                 if (bid<=token && bid>=currentBid){
-                  var update = "UPDATE data_game SET bought_by="+ "'"+ playername +"'"+ ", bid_for="+ bid + " WHERE cartodb_id="+globalX;
-                  submitToProxy2(update);
+                  // var update = "UPDATE data_game SET bought_by="+ "'"+ playername +"'"+ ", bid_for="+ bid +"'"+", current_owner="+ playername +" WHERE cartodb_id="+globalX;
+
+                  var update = "UPDATE data_game SET bought_by= '"+ playername +"' ,bid_for="+ bid +",current_owner= '"+ playername + "', playercolor='" + playercolor + "' WHERE cartodb_id="+globalX;
+                  
+                  console.log('this was submitted upon purchase', update);
+                  submitToProxy(update);
                   console.log('this was submitted upon purchase', update);
                   console.log('tokencount', bid);
 
                   //update your area count and token count:
                   postData( "index.php", {
-                    variable2: bid,
-                    variable3: area,
+                    variable2: bid, //subtract purchase from token count
+                    variable3: area, //add area
                     enteredName: playername
                   });
+                  alert('this lot is yours now');
 
                 } else {
-                  alert('your bid is invalid');
+                  alert('you bid more than you have tokens or less than required');
                 }
 
                 dialog2.dialog("close");
@@ -335,11 +356,11 @@ if($pageWasRefreshed) {
             });
 
             layer.setStyle({
-              color: getColor(feature.properties.usage)
+              color: feature.properties.playercolor
             });
 
             var label = L.marker(layer.getBounds().getCenter());
-            layer.bindPopup('<b>Discovered by:</b> ' + feature.properties.player1 + '<br> <b>Area:</b> ' + feature.properties.area + '<br><b>Acquired by:</b> ' + feature.properties.bought_by + '<br><b>Bid for:</b> '+ feature.properties.bid_for + '<br> '+feature.properties.no_falsified+' flagged this as false'+'');
+            layer.bindPopup('<b>Discovered by:</b> ' + feature.properties.player1 + '<br> <b>Area:</b> ' + feature.properties.area + '<br><b>current owner:</b> ' + feature.properties.current_owner + '<br><b>Bid for:</b> '+ feature.properties.bid_for + '<br> '+feature.properties.no_falsified+' <i class="fas fa-flag"></i>'+'');
           }
         }).addTo(map);
         
@@ -349,13 +370,75 @@ if($pageWasRefreshed) {
 };
 
 
+//------------------------ load map on load---------------------
+  $(document).ready(function() {
+    $("#flag").hide();
+    getGeoJSON();
+        //get points
+    $.getJSON("./data/points_selected.geojson",{contentType: "application/json; charset=UTF-8"},function(data){
+        // add GeoJSON layer to the map once the file is loaded
+        //console.log('pointsselected',data.features[session_key].geometry.coordinates[0][0]);
+        //console.log('length',data.features.length);
+        console.log('hello?',session_key);
+        console.log('this is the id of search poly', data.features[session_key].properties.id);
+        var coords1 = data.features[session_key].geometry.coordinates[0][0];
+        var coords2 = data.features[session_key].geometry.coordinates[0][1];
+        map.panTo(new L.LatLng(coords2,coords1));
+    });
+  });
+
+  //this runs once drawn polygon is closed
+  map.on('draw:created', function (e) {
+    var layer = e.layer;
+    map.addLayer(drawnItems);
+    drawnItems.addLayer(layer);
+    area = L.GeometryUtil.geodesicArea(layer.getLatLngs());
+    //dialog.dialog("open");
+    console.log("run");
+    console.log("this should be the area of polygon", area);
+  });
+
+
+//------------------------ submit to proxy---------------------
+  var submitToProxy = function(q){
+      $.post("php/callProxy.php", { // <--- Enter the path to your callProxy.php file here
+        qurl:q,
+        cache: false,
+        timeStamp: new Date().getTime()
+      }, function(data) {
+        console.log(data);
+        //loads the new data- but does not seem to work?
+        refreshLayer();
+      });
+    };
+
+    // var submitToProxy2 = function(q){
+    //   $.post("php/callProxy.php", { // <--- Enter the path to your callProxy.php file here
+    //     qurl:q,
+    //     cache: false,
+    //     timeStamp: new Date().getTime()
+    //   }, function(data) {
+    //     console.log(data);
+    //   });
+    // };
+
+    var postData = function(url,data){
+      if ( !url || !data ) return;
+      //data.cache = false;
+      //data.timeStamp = new Date().getTime()
+      $.post(url,
+        data, function(d) {
+      //console.log(d);
+    });
+    }
+
+
 function getRandomArbitrary(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
-
-console.log('this will be undefined', cartoDBpoints);
-console.log('sessionkey', session_key);
+//console.log('sessionkey', session_key);
+//console.log('sessionarray', session_array);
 
     var drawControl = new L.Control.Draw({
       position: 'topright',
@@ -408,33 +491,17 @@ console.log('these are all the items', drawnItems);
     map.scrollWheelZoom.disable();
     map.boxZoom.disable();
 
-    // Add Tile Layer basemap
-    L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
-      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 18,
-      subdomains:['mt0','mt1','mt2','mt3']
-    }).addTo(map);
 
     // Your script will go here!
     // Function to run when feature is drawn on map
 
     var area = null; 
 
-    map.on('draw:created', function (e) {
-      var layer = e.layer;
-      drawnItems.addLayer(layer);
-      map.addLayer(drawnItems);
-      area = L.GeometryUtil.geodesicArea(layer.getLatLngs());
-    //dialog.dialog("open");
-    console.log("run");
-    console.log("this should be the area of polygon", area);
-  });
-
   //goddammit this is still null.
   console.log("this should be the area of polygon2", area);
 // ----------------the dialog to collect information----------------------
 //   Use the jQuery UI dialog to create a dialog and set options
-var dialog = $("#dialog").dialog({
+dialog = $("#dialog").dialog({
   autoOpen: false,
   height: 300,
   width: 350,
@@ -461,55 +528,20 @@ var dialog = $("#dialog").dialog({
 // Stops default form submission and ensures that setData or the cancel function run
 var form = dialog.find("form").on("submit", function(event) {
   event.preventDefault();
+  setData();
 });
-
-
-//console.log('points number2', cartoDBpoints);
-
-var submitToProxy = function(q){
-      $.post("php/callProxy.php", { // <--- Enter the path to your callProxy.php file here
-        qurl:q,
-        cache: false,
-        timeStamp: new Date().getTime()
-      }, function(data) {
-        console.log(data);
-        //loads the new data- but does not seem to work?
-        refreshLayer();
-      });
-    };
-
-
-    var submitToProxy2 = function(q){
-      $.post("php/callProxy.php", { // <--- Enter the path to your callProxy.php file here
-        qurl:q,
-        cache: false,
-        timeStamp: new Date().getTime()
-      }, function(data) {
-        console.log(data);
-      });
-    };
-
-    var postData = function(url,data){
-      if ( !url || !data ) return;
-      //data.cache = false;
-      //data.timeStamp = new Date().getTime()
-      $.post(url,
-        data, function(d) {
-      //console.log(d);
-    });
-    }
 
 
     function timeConvert(unix){
       var a = new Date(unix * 1000);
       var year = a.getFullYear();
-  var month = a.getMonth()+1; //starts from 0
-  var day = a.getDate();
-  var hour = a.getHours();
-  var min = a.getMinutes();
-  var sec = a.getSeconds();
-  var time = year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec ;
-  return time;
+      var month = a.getMonth()+1; //starts from 0
+      var day = a.getDate();
+      var hour = a.getHours();
+      var min = a.getMinutes();
+      var sec = a.getSeconds();
+      var time = year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec ;
+      return time;
 }
 
 //polygon: {"type": "Polygon","coordinates": [[ [100.0, 0.0], [101.0, 0.0], [101.0, 1.0],[100.0, 1.0], [100.0, 0.0] ] ]}
@@ -530,14 +562,13 @@ function setData() {
   //   variable2: 8
   // });
 
-  //number of polygon that is searched. needs updating!
-  var search_poly = 10;
-
   // ST_SetSRID(geometry geom, integer srid);
   drawnItems.eachLayer(function(layer){
-    var sql = "INSERT INTO data_game (the_geom,no_falsified,search_polygon,created_at,usage, player1,tokensOfPlayer,area) VALUES (ST_SetSRID(ST_GeomFromGeoJSON('";
-
+    var sql = "INSERT INTO data_game (the_geom,no_falsified,search_polygon,created_at,usage, player1,tokensOfPlayer,area,current_owner,playercolor) VALUES (ST_SetSRID(ST_GeomFromGeoJSON('";
+    
+    //var search_poly =  layer.features[session_key].properties.cartodb_id;
     var a = layer._latlngs;
+
     console.log('what is a', a);
     var coords = "";
     
@@ -548,7 +579,7 @@ function setData() {
           coords += '['+lng + ',' + lat+'],';
         }
 
-        var unixTime = Math.floor(Date.now() / 1000);
+    var unixTime = Math.floor(Date.now() / 1000);
     //console.log(unixTime);
     var area = Math.round(L.GeometryUtil.geodesicArea(layer.getLatLngs()));
 
@@ -557,37 +588,44 @@ function setData() {
     // var sql2 ='{"type":"Point","coordinates":[' + a.lng + "," + a.lat + "]}'),4326),'" + search_poly + "','" +  timeConvert(unixTime) + "','" + usage + "','" + enteredUsername + "','" + token + "','" + a.lat + "','" + a.lng +"')";
     postData( "index.php", {
       variable1: 1, //land
-      // variable2: 8, let's for now assum you don't loose tokens
+      // variable2: 8, let's for now assume you don't loose tokens
       variable3: area,
       enteredName: playername
     });
 
     console.log('playername',playername);
+    //console.log('search poly',search_poly);
 
-    //NEW
-    var sql2 ='{"type":"MultiPolygon","coordinates":[[[' + coords + "]]]}'),4326),'" + flagDefault + "','" + search_poly + "','" +  timeConvert(unixTime) + "','" + usage + "','" + playername + "','" + token + "','" + area +"')";
+    //NEW. This is very unelegant but gets data from json1 and submits new data to cartodb
+    $.getJSON("./data/points_selected.geojson",{contentType: "application/json; charset=UTF-8"},function(data){
+        console.log('this is the id of search poly', data.features[session_key].properties.id);
+ 
+        var sql2 ='{"type":"MultiPolygon","coordinates":[[[' + coords + "]]]}'),4326),'" + flagDefault + "','" + data.features[session_key].properties.id + "','" +  timeConvert(unixTime) + "','" + usage + "','" + playername + "','" + token + "','" + area + "','" + playername + "','" + playercolor +"')";
 
-    var pURL = sql+sql2;
-    console.log(pURL)
+        var pURL = sql+sql2;
+        console.log(pURL)
         //this is the function that will submit the request to proxy. see line 170
         submitToProxy(pURL);
         console.log("Feature has been submitted to the Proxy");
-      });
+  
+    });
+});
 
   map.removeLayer(drawnItems);
   drawnItems = new L.FeatureGroup();
   console.log("drawnItems has been cleared");
   dialog.dialog("close");
   alert("You purchased a property!");
-}
+};
 
 //if post was sent new data is loaded
 function refreshLayer() {
-  if (map.hasLayer(cartoDBPoints)) {
-    console.log('points number3', cartoDBpoints);
-    map.removeLayer(cartoDBPoints);
+  if (map.hasLayer(cartoDBpoints)) {
+    map.removeLayer(cartoDBpoints);
+    console.log('map had cartodb points');
   };
   getGeoJSON();
+  console.log('layer refreshed');
 };
 
 </script>

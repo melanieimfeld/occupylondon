@@ -27,7 +27,7 @@ if($pageWasRefreshed) {
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Settlers of London</title>
+    <title>Spot-a-lot</title>
 
     <!-- Bootstrap core CSS -->
     <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -54,68 +54,192 @@ if($pageWasRefreshed) {
   </head>
 
   <body>
+  <!-- -----------------the dialog element for submission--------------------- -->
+  <div id="dialog" title="Property Information" style="display:none">     
+    <form>
+      <fieldset style="border: none;">
+          <ul style="list-style-type: none; padding-left: 0px">
+              <li><label for="usage">What would you build here?</label></li>
+              <li><select for="usage" id="usage">
+                <option value="Housing" class="text ui-widget-content ui-corner-all">Affordable Housing</option>
+                <option value="Retail" class="text ui-widget-content ui-corner-all">A shopping temple</option>
+                <option value="Home" class="text ui-widget-content ui-corner-all">My own home</option>
+                <option value="Garden" class="text ui-widget-content ui-corner-all">A community garden</option>
+                <option value="Bar" class="text ui-widget-content ui-corner-all">A pop up bar</option>
+                <option value="School" class="text ui-widget-content ui-corner-all">A school</option>
+                <option value="other" class="text ui-widget-content ui-corner-all">I have another idea</option>
+              </select></li>
+          </ul>
+        <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+      </fieldset>
+    </form>
+  </div>
 
-<!------------------------------- Navigation -------------------->
+
+ 
+<!--  https://stackoverflow.com/questions/15649001/bootstrap-input-field-and-dropdown-button-submit#15649153 -->
+    <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Modal Header</h4>
+        </div>
+        <div class="modal-body">
+        <!-- tryin to put a dropdown in the modal. on submit, send the content to xx --> 
+        <form name="searchForm" id="searchForm" method="POST" action="php/build.php">
+            <input type="hidden" name="selection" id="buildInput"> 
+            <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Dropdown Example
+            <span class="caret"></span></button>
+            <input id="search_type" name="search_type" type="hidden">
+            <ul class="dropdown-menu" id="dropdownBuild">
+            </ul>
+          </div>
+        </form> 
+        <!-- end of dropdown -->
+        </div>
+        <div class="modal-footer">
+          <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+          <button id="allSubmitBtn" class="btn btn-success">Save Neighborhood!</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+    <!-- -----------------the dialog element for acquiring--------------------- -->
+    <div id="spinnerControls" style="display:none">
+      <label id="spinnerLabel" for="spinner"></label>
+      <input id="spinner" type="number">
+      <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+    </div>
+
+    <!------------------------------- Navigation -------------------->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
       <div class="container">
-        <a class="navbar-brand" href="map.php" style="cursor:pointer">RETURN</a>
-      <!--   <a class="navbar-brand" onclick="window.location.reload()" style="cursor:pointer">NEXT</a>
-        <a id='flag' class="navbar-brand" onclick="addFlag()" style="display:none; cursor:pointer">FLAG</a> -->
+        <a class="navbar-brand" href="map.php"><button type="button" href="map.php" class="btn btn-primary">SPOT MORE</button></a>
+        <a class="navbar-brand" style="cursor:pointer"><i class="fas fa-arrow-up"></i> BUILD</a>
+        <a id='flag' class="navbar-brand" style="display:none; cursor:pointer">FLAG</a>
+        <a id='acquire' class="navbar-brand" style="display:none; cursor:pointer">ACQUIRE ME</a>
 
-        <!-- <a class="navbar-brand" href="?inc=TRUE">Increment</a> -->
-
-<!--------------------- these are the control buttons for drawing (old)----------------------->
-       <!--  <div id="controls" style="display:none">
-          <a class="navbar-brand" onclick="startEdits()" value="Click to Start Editing" style="cursor:pointer">start editing</a>
-          <a class="navbar-brand" onclick="stopEdits()" value="Stop Your Editing Session" style="cursor:pointer">stop editing</a>
-          <a class="navbar-brand" onclick="stopEdits()" value="Stop Your Editing Session" style="cursor:pointer">save</a>
-        </div> -->
-
-<!--------------------- these are the control buttons for drawing (new)----------------------->
+        <!--------------------- these are the control buttons for drawing (new)----------------------->
         <div id="controls" style="display:none">
-          <a id="startBtn" class="navbar-brand" style="cursor:pointer">start editing</a>
+          <a id="startBtn" class="navbar-brand" style="cursor:pointer">start mapping</a>
           <a id="deleteBtn" class="navbar-brand" style="cursor:pointer">delete</a>
-          <a id="saveBtn" class="navbar-brand" style="cursor:pointer">save</a>
+          <a id="saveBtn" class="navbar-brand" style="cursor:pointer">claim this land</a>
         </div>
-<!--------------------- all the rest in navbar ----------------------->       
+        <!--------------------- all the rest in navbar ----------------------->       
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item active">
-              <a class="nav-link" href="#">Score overview
+              <a class="nav-link" href="scoreoverview.php">Score overview
                 <span class="sr-only">(current)</span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">About</a>
+              <a class="nav-link" href="#">Rules</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="logout.php" name="logout">Logout</a>
+              <a class="nav-link" href="logout.php">Logout</a>
             </li>
           </ul>
         </div>
       </div>
     </nav>
-<!--------------------- this is the container with land and tokens ----------------------->  
-     <div class="container-fluid" style="pointer-events: none">
-      <div class="row">
-        <div class="col-md-12">
-          <h1 class="mt-5">SCORE OVERVIEW</h1>
-        </div>
-         <div class="col-md-12">
+    <!--------------------- this is the container with land and tokens ----------------------->  
+    <div class="container-fluid">
+
+    <div class="row">
+        <div class="col-md-5" id="chart1">
+          <h3 class="mt-3">Building options</h3>
+          <table class="table table-hover" style="width:100%">
+            <tr>
+              <th>Type</th>
+              <th>Max. Area (sqm)</th> 
+              <th>Cost (Tokens)</th>
+            </tr>
+            <tr>
+              <td>Hospital</td>
+              <td>4'000</td> 
+              <td>70</td>
+            </tr>
+            <tr>
+              <td>Shopping Temple</td>
+              <td>2'000</td> 
+              <td>57</td>
+            </tr>
+            <tr>
+              <td>School</td>
+              <td>2'000</td> 
+              <td>20</td>
+            </tr>
+             <tr>
+              <td>Housing</td>
+              <td>700</td> 
+              <td>7</td>
+            </tr>
+            <tr>
+              <td>Community Center</td>
+              <td>200</td> 
+              <td>2</td>
+            </tr>
+             <tr>
+              <td>Grocery Store</td>
+              <td>100</td> 
+              <td>1</td>
+            </tr>
+              <tr>
+              <td>Community garden</td>
+              <td>100</td> 
+              <td>1</td>
+            </tr>
+            <tr>
+              <td>Pop up bar</td>
+              <td>50</td> 
+              <td>1</td>
+            </tr>
+          </table>
           <svg class="chart"></svg>
+        </div>
+        <div class="col-md-7">
+          <div id="map" class="mt-3"></div>
         </div>
       </div>
     </div>
+  </div>
 
- <div id="map"></div>
+    <!-- Page Content -->
+    
 
-
-</div><!--/.fluid-container-->
+  </div> <!--/.fluid-container-->
 
 <script>
+
+function stuffToResize(){
+        var h_window = $(window).height();
+        var h_map = h_window - 70;
+        $('#map').css('height', h_map);
+}
+
+function build(){
+  var y = $('#search_type').val('store');
+  console.log('what is this', y); 
+  //var z = $('#searchForm').submit();
+}
+
+$(window).on("resize", stuffToResize).trigger('resize'); 
+
+var width = document.getElementById('chart1').clientWidth;
+console.log('clientwidth', width);
+
   //counting site visits
    var counter = 0;
    var tokens = document.getElementById('tokens');
@@ -142,8 +266,12 @@ if($pageWasRefreshed) {
     //write the SQL query I want to use
     var SQLquery = "SELECT * FROM data_game";
 
+    var playername = <?php echo json_encode($_SESSION['username']); ?>;  //get playername
+
      // Create Leaflet map object
-    var map = L.map('map',{ center: [51.5310, 0.1007], zoom: 15});
+    var map = L.map('map',{ center: [51.5310, 0.1007], zoom: 15, zoomControl:true});
+
+    map.scrollWheelZoom.enable();
 
     //update getScores ever 5 seconds
     setInterval(getScores(),5000);
@@ -165,7 +293,7 @@ if($pageWasRefreshed) {
       if (flagged==false){
       var carto = 46;
       var sql = "UPDATE data_game SET no_falsified=no_falsified+1 WHERE cartodb_id="+carto;
-      submitToProxy2(sql);
+      submitToProxy(sql);
         alert("you just flagged a falsely classified property");
       flagged=true;
       } else{
@@ -175,59 +303,90 @@ if($pageWasRefreshed) {
     }
 
 
+
     //get CARTO selection as geoJSON and add to leaflet map
     function getGeoJSON(){
       $.getJSON("https://"+cartoDBusername+".carto.com/api/v2/sql?format=GeoJSON&q="+SQLquery, function(data){
-        
-        function style(feature) {
-        return {
-              'color': getColor(feature.properties.usage)
-          };
-        };
 
 
-      function getColor(d) {
-        return d == 'Affordable Housing' ? '#d73027' :
-                 d == 'A pop up bar'  ? '#f46d43' :
-                 d == 'My own home'  ? '#fdae61' :
-                 d == 'A shopping temple'  ? '#fee090' :
-                 d == 'A grocery store'  ? '#74add1' :
-                 d == 'A school'  ? '#4575b4' :
-                 d == 'A community garden'  ? '#4d9221' :
-                 d == 'I have another idea'  ? '#a7b000' :
-                            '#f5f635';
+    //console.log('value selected', selText);
+    
+  
+
+       //if plot is classified as bought make opacity zero 
+      function getOpacity(d) {
+        return d == true ? 1 :
+              d == false  ? 0.1:
+                0.5;
       };
 
         cartoDBpoints=L.geoJson(data, {
           style:hStyle,
           onEachFeature: function(feature, layer) {
 
-          
-            //for each player, make summary stats
-            // for (var i=0;i<names.length;i++){
-            //   if (names[i] = layer.feature.properties.player1){
-            //       //var area = area + layer.feature.properties.area;
-            //       //scores.push(area);
-            //   }
-            // }
-            
-            layer.on('click', function () {
-              $("#flag").show(300);
-            });
-
             layer.setStyle({
-              color: getColor(feature.properties.usage)
+              color: feature.properties.playercolor,
+              fillOpacity: getOpacity(feature.properties.secured)
             });
 
-            //console.log('what is a layer', layer);
-            //layer.bindLabel('test');
+
+            //only make markers clickable that belong to player
+            if (feature.properties.current_owner == playername){
+
+
+//---------------------------This is the entire building selection--------------------
+            layer.on('click', function (){
+
+              //create list dynamically.
+              var list = document.getElementById('dropdownBuild');
+              //var firstname = document.getElementById('firstname').value;
+              var buildings = {'School': 2000, 'Hospital': 4000,'Pop-up Bar':50,'Housing':700};
+
+              for (var k in buildings){
+                if (buildings[k] >= feature.properties.area){
+                  var entry = document.createElement('li');
+                  entry.appendChild(document.createTextNode(k));
+                  list.appendChild(entry);
+                }
+              }
+
+              var selText;
+              var globalX = feature.properties.cartodb_id;
+              $(".dropdown-menu li").click(function(){
+                selText = $(this).text();
+                console.log('value selected', selText);
+                //$(this).parents('.btn-group').find('.dropdown-toggle').html(selText+'<span class="caret"></span>');
+                $("#allSubmitBtn").click(function(e){
+                  var sql ="UPDATE data_game SET usage='"+selText+"', secured="+true+" WHERE cartodb_id="+globalX;
+                  console.log(sql)
+                  //this is the function that will submit the request to proxy. see line 170
+                  submitToProxy(sql);
+                  $("#myModal").modal('hide');
+                });
+              });
+              console.log('this is the list', list);
+
+            });
+
+//---------------------------popup container--------------------
+            var container = $('<div />');
             var label = L.marker(layer.getBounds().getCenter());
-            layer.bindPopup('' + feature.properties.usage + ' <br> belongs to ' + feature.properties.player1 + ' <br> '+feature.properties.no_falsified+' flagged this as false'+'');
+
+
+            // Insert whatever you want into the container, using whichever approach you prefer
+            container.html("Area: "+feature.properties.area+" Used as: "+feature.properties.usage+" <button type='button' class='btn btn-primary' title='build something' data-toggle='modal' data-target='#myModal'>Build now!</button>.");
+            //container.append($('<span class="bold">').text(" :)"))
+
+            // Insert the container into the popup
+            layer.bindPopup(container[0]);
+            $("#dropdownBuild").empty();
+
           }
-        }).addTo(map);
+        }
+      }).addTo(map);
   
-      });
-    };
+    });
+  };
 
 
     // var random = getRandomArbitrary(0,5);
@@ -524,9 +683,9 @@ function setData() {
 
 //if post was sent new data is loaded
 function refreshLayer() {
-      if (map.hasLayer(cartoDBPoints)) {
+      if (map.hasLayer(cartoDBpoints)) {
         console.log('points number3', cartoDBpoints);
-        map.removeLayer(cartoDBPoints);
+        map.removeLayer(cartoDBpoints);
       };
       getGeoJSON();
     };
