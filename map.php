@@ -169,9 +169,9 @@ if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
     <div class="container-fluid" style="pointer-events: none">
       <div class="row">
         <div class="col-md-12">
-          <h1 class="mt-3"> <?php echo json_encode($_SESSION['username'])?>, SPOT A VACANT LOT!</h1>
+          <h1 class="mt-3"> <?php echo htmlspecialchars($_SESSION['username'])?>, SPOT A VACANT LOT!</h1>
         </div>
-        <div class="col-md-2"></span> Tokens: <?php echo $_SESSION['token']?> </div>
+        <div class="col-md-2"></span>Your tokens: <?php echo $_SESSION['token']?> </div>
         <div class="col-md-2" id ="area"></div>
         <div class="col-md-2" id ="land"></div>
         <div class="col-md-4" id ="flags"></div>
@@ -657,14 +657,6 @@ function setData() {
     var area = Math.round(L.GeometryUtil.geodesicArea(layer.getLatLngs()));
 
     var flagDefault = 0; 
-    //OLD
-    // var sql2 ='{"type":"Point","coordinates":[' + a.lng + "," + a.lat + "]}'),4326),'" + search_poly + "','" +  timeConvert(unixTime) + "','" + usage + "','" + enteredUsername + "','" + token + "','" + a.lat + "','" + a.lng +"')";
-    postData( "index.php", {
-      variable1: 1, //land
-      // variable2: 8, let's for now assume you don't loose tokens
-      variable3: area,
-      enteredName: playername
-    });
 
     console.log('playername',playername);
     //console.log('search poly',search_poly);

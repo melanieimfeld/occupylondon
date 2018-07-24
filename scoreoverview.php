@@ -200,6 +200,11 @@ if(isset($_POST['tokenMinusB'])){ //when user bought lot. could have been on map
             </tr>
           </table>
           <svg class="chart"></svg>
+          <div class="row">
+            <div class="col-md-4"></span>Your tokens: <?php echo htmlspecialchars($_SESSION['token'])?> </div>
+            <div class="col-md-4" id ="area"></div>
+            <div class="col-md-4" id ="land"></div>
+          </div>
         </div>
         <div class="col-md-7">
           <div id="map" class="mt-3"></div>
@@ -259,14 +264,20 @@ console.log('clientwidth', width);
     var SQLquery = "SELECT * FROM data_game";
 
     var playername = <?php echo json_encode($_SESSION['username']); ?>;  //get playername
+    var token = <?php echo json_encode($_SESSION['token']); ?>;  
 
      // Create Leaflet map object
     var map = L.map('map',{ center: [51.5310, 0.1007], zoom: 15, zoomControl:true});
 
-    map.scrollWheelZoom.enable();
+    var cont1 = document.getElementById('area');
+    var cont2 = document.getElementById('land');
+    getScores(cont1,cont2);
 
     //update getScores ever 5 seconds
-    setInterval(getScores(),5000);
+    // setInterval(function () {
+    //   getScores(cont1,cont2);
+    //   console.log('update');
+    // }, 5000);
 
     //show controls when button 'vacant' is pressed
     function addButtons(){
@@ -352,20 +363,25 @@ console.log('clientwidth', width);
 
               var selText;
               var globalX = feature.properties.cartodb_id;
+              var tokenVal = 5;
+
               $(".dropdown-menu li").click(function(){
                 selText = $(this).text();
                 console.log('value selected', selText);
                 //$(this).parents('.btn-group').find('.dropdown-toggle').html(selText+'<span class="caret"></span>');
                 jQuery(function($){
                   $("#allSubmitBtn").click(function(e){
+                    if (token >= tokenVal){
                     var sql ="UPDATE data_game SET usage='"+selText+"', secured="+false+" WHERE cartodb_id="+globalX;
-                    console.log(sql)
                     //this is the function that will submit the request to proxy. see line 170
                     submitToProxy(sql);
-                    $.redirect("scoreoverview.php", {tokenMinusB: 5}, "POST"); 
+                    $.redirect("scoreoverview.php", {tokenMinusB: tokenVal}, "POST"); 
                     $("#myModal").modal('hide');
-                    $("#dropdownBuild").children().remove();
+                    //$("#dropdownBuild").children().remove();
                     console.log('building submitted to db and tokes deducted');
+                    } else {
+                      alert('not enough tokens!');
+                    }
                   });
                 });
 

@@ -1,19 +1,16 @@
-
 <?php
 include 'php/cartoDBProxy.php';
-ini_set('display_errors',1);
-
+ini_set('display_errors',true);
 session_start();
 
-//$_SESSION['count']=0;
-//$_SESSION['token']=0;
-$_SESSION['land']=0;
-$_SESSION['area']=0;
 
-//if anything was submitted
-if ($_POST) {
+//if username was submitted
+if (isset($_POST["name"])) {
+  //echo "username was entered";
+  print_r(htmlspecialchars($_POST["name"]));
   //currently, username doesn't allow quotation marks. throws error
-  $name = $_POST["enteredName"];
+  $_SESSION["username"] = $_POST["name"];
+  $name = $_POST["name"];
  
   //check if user exists
   $queryURL = "SELECT playercolor,current_owner FROM data_game WHERE current_owner='$name' LIMIT 1";
@@ -25,47 +22,30 @@ if ($_POST) {
 
   //numbers are not recognized and true is returned
   if (!in_array($name ,$return)){
-    echo 'name in array';
+    echo 'name in array ';
     //echo var_dump($return);
     //assign existing color
     $_SESSION['usercolor'] = $return["rows"][0]["playercolor"];
-    echo $_SESSION['usercolor'];
-    // set the other session variables
-    $_SESSION['username'] = $name;
-    //update scores
-    $_SESSION['land'] = $_SESSION['land']+$_POST["variable1"];
-    $_SESSION['area'] = $_SESSION['area']+$_POST["variable3"];
-      //create an array and shuffle it for each user once
-    $_SESSION['array'] = range(0,109);
-    shuffle($_SESSION['array']);
-    header("Location: map.php"); die();
+    echo " oldcolor".$_SESSION['usercolor'];
 
   } else {
     //echo var_dump($return);
-    echo 'not in array';
+    echo 'not in array ';
     //make new color (....that doesn't exist yet!)
-    $_SESSION['usercolor'] = randCol(100,255);
-    $_SESSION['username'] = $name;
-    //update scores
-    $_SESSION['land'] = $_SESSION['land']+$_POST["variable1"];
-    $_SESSION['area'] = $_SESSION['area']+$_POST["variable3"];
-      //create an array and shuffle it for each user once
-    $_SESSION['array'] = range(0,109);
-    shuffle($_SESSION['array']);
-    header("Location: map.php"); die();
+    $_SESSION['usercolor'] = "#9091ED";
+    echo $_SESSION['usercolor'];
+    if(!in_array($_SESSION['usercolor'],$return)){
+      echo ' color already exists';
+      $_SESSION['usercolor'] = randCol(150,255);
+    }
   }
- 
-} else {
-  //$_SESSION['username'] = $name;
-  //$_SESSION['token']=0;
-  $_SESSION['land']=0;
-  $_SESSION['area']=0;
-
+  // $_SESSION['array'] = range(0,109);
+  // shuffle($_SESSION['array']);
+  // header("Location: map.php"); die();
 }
 
 //get an assigned color for user
-function randCol($minVal = 0, $maxVal = 255)
-{
+function randCol($minVal = 0, $maxVal = 255){
     // Make sure the parameters will result in valid colours
     $minVal = $minVal < 0 || $minVal > 255 ? 0 : $minVal;
     $maxVal = $maxVal < 0 || $maxVal > 255 ? 255 : $maxVal;
@@ -101,7 +81,7 @@ function randCol($minVal = 0, $maxVal = 255)
         </div>
         <form method="post">
         enter your playername: <br>
-        <input type="text" name="enteredName" required><br>
+        <input type="text" name="name" required><br>
         <!-- <input type="submit"> -->
         <button type="submit" href="map.php" class="btn btn-primary">START</button>
         </form>
