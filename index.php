@@ -5,8 +5,8 @@ ini_set('display_errors',1);
 
 session_start();
 
-$_SESSION['count']=0;
-$_SESSION['token']=0;
+//$_SESSION['count']=0;
+//$_SESSION['token']=0;
 $_SESSION['land']=0;
 $_SESSION['area']=0;
 
@@ -33,7 +33,6 @@ if ($_POST) {
     // set the other session variables
     $_SESSION['username'] = $name;
     //update scores
-    $_SESSION['token'] = $_SESSION['token']- $_POST["variable2"];
     $_SESSION['land'] = $_SESSION['land']+$_POST["variable1"];
     $_SESSION['area'] = $_SESSION['area']+$_POST["variable3"];
       //create an array and shuffle it for each user once
@@ -48,7 +47,6 @@ if ($_POST) {
     $_SESSION['usercolor'] = randCol(100,255);
     $_SESSION['username'] = $name;
     //update scores
-    $_SESSION['token'] = $_SESSION['token']-$_POST["variable2"];
     $_SESSION['land'] = $_SESSION['land']+$_POST["variable1"];
     $_SESSION['area'] = $_SESSION['area']+$_POST["variable3"];
       //create an array and shuffle it for each user once
@@ -59,7 +57,7 @@ if ($_POST) {
  
 } else {
   //$_SESSION['username'] = $name;
-  $_SESSION['token']=0;
+  //$_SESSION['token']=0;
   $_SESSION['land']=0;
   $_SESSION['area']=0;
 

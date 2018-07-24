@@ -9,18 +9,26 @@ if (empty($_SESSION['username'])){
    header("Location: index.php");
 }
 
-//110 is length of points selected
-if($pageWasRefreshed) {
-  $_SESSION['token']++;
-    //echo $_SESSION['array'][$_SESSION['count']];
-  if ($_SESSION['count']< $NoSearchPolys){
-    $_SESSION['count']++;
-  } else {
+//---------------all tokenupdates-----------------
+if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
+	$_SESSION['token']=$_SESSION['token']+1;
+	//echo $_SESSION['token'];
+	if ($_SESSION['count']< $NoSearchPolys){
+    	$_SESSION['count']++;
+  	} else {
+    	$_SESSION['count']=0;
+  	}
+//echo $counter+1;
+} elseif(isset($_POST['tokenMinus'])){ //user acquired another lot or bought something
+	echo 'Session var before operation '.$_SESSION['token'];
+	$_SESSION['token']=$_SESSION['token']-$_POST['tokenMinus'];
+	echo 'Session var after operation '.$_SESSION['token'];
+	echo 'bid '.$_POST['tokenMinus'];
+} elseif (!isset($_SESSION['token'])) { //this should only happen when user just entered the game
+    $_SESSION['token']=0;
     $_SESSION['count']=0;
-  }
+    echo 'else statement, reason why token turns zero?'.$_SESSION['token']; 
 }
-
-#echo $_SESSION['usercolor'];
 
 ?>
 
@@ -53,6 +61,7 @@ if($pageWasRefreshed) {
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
   <!--  <script src='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.js'></script> -->
   <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <script src="js/jquery.redirect.js"></script>
 
   <!-- Bootstrap core JavaScript -->
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -94,18 +103,18 @@ if($pageWasRefreshed) {
     </div>
  -->
      <!-- -----------------the dialog element (using modal) for acquiring--------------------- -->
-    <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal fade" id="ModalBuy" role="dialog">
     <div class="modal-dialog">
     
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title"><i class="fas fa-building"></i>  Secure your lot by building</h4>
+          <h4 class="modal-title"><i class="fa fa-shopping-cart" aria-hidden="true"></i>  Acquire someone elses lot</h4>
         </div>
         <div class="modal-body" id="modalbody">
-            <p>You can secure your lot from being bought by others by building something on it. Only the options that fulfil the area requirements are shown. Keep in mind your tokencount.</p>
-          <div id="spinnerControls" style="display:none">
+         <!--  spinner  -->
+          <div id="spinnerControls">
             <label id="spinnerLabel" for="spinner"></label>
             <input id="spinner" type="number">
             <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
@@ -113,7 +122,7 @@ if($pageWasRefreshed) {
         </div>
         <div class="modal-footer">
           <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Cancel</button>
-          <button id="allSubmitBtn" class="btn btn-primary">Build!</button>
+          <button id="acquireBtn" class="btn btn-primary">Acquire!</button>
         </div>
       </div>
       
@@ -124,17 +133,19 @@ if($pageWasRefreshed) {
     <!------------------------------- Navigation -------------------->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
       <div class="container">
-        <a class="navbar-brand" onclick="addButtons()" value="addbuttons" style="cursor:pointer">VACANT</a>
-        <a class="navbar-brand" onclick="window.location.reload()" style="cursor:pointer">SPOT ANOTHER</a>
-        <a class="navbar-brand" style="cursor:pointer"><i class="fas fa-arrow-up"></i> BUILD</a>
+      	<a class="navbar-brand" onclick="addButtons()" value="addbuttons" style="cursor:pointer"><i class="fas fa-tree"></i> VACANT</a>
+        <a class="navbar-brand" id="btnToken" style="cursor:pointer"><i class="fas fa-arrow-up"></i> SPOT ANOTHER</a>
+        <a class="navbar-brand" href="scoreoverview.php"style="cursor:pointer; color:'#f05742'"><i class="fas fa-building"></i> BUILD</a>
+       
+    <!------------------------------- on layer click -------------------->
         <a id='flag' class="navbar-brand" style="display:none; cursor:pointer">FLAG</a>
         <a id='acquire' class="navbar-brand" style="display:none; cursor:pointer">ACQUIRE ME</a>
 
         <!--------------------- these are the control buttons for drawing (new)----------------------->
         <div id="controls" style="display:none">
-          <a id="startBtn" class="navbar-brand" style="cursor:pointer">start mapping</a>
-          <a id="deleteBtn" class="navbar-brand" style="cursor:pointer">delete</a>
-          <a id="saveBtn" class="navbar-brand" style="cursor:pointer">claim this land</a>
+          <button class="btn btn-primary" id="startBtn" aria-hidden="true">start mapping</button>
+          <button class="btn btn-primary" id="deleteBtn" aria-hidden="true">delete</button>
+          <button class="btn btn-primary" id="saveBtn" aria-hidden="true">claim</button>
         </div>
         <!--------------------- all the rest in navbar ----------------------->       
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
@@ -143,15 +154,12 @@ if($pageWasRefreshed) {
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item active">
-              <a class="nav-link" href="scoreoverview.php">Score overview
+              <a class="nav-link" href="logout.php">Logout
                 <span class="sr-only">(current)</span>
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">Rules</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="logout.php">Logout</a>
             </li>
           </ul>
         </div>
@@ -164,8 +172,8 @@ if($pageWasRefreshed) {
           <h1 class="mt-3"> <?php echo json_encode($_SESSION['username'])?>, SPOT A VACANT LOT!</h1>
         </div>
         <div class="col-md-2"></span> Tokens: <?php echo $_SESSION['token']?> </div>
-        <div class="col-md-2" id ="land"> Pioneered Land: <?php echo $_SESSION['land']?> </div>
-        <div class="col-md-2" id ="area"> Area: <?php echo $_SESSION['area']?> </div>
+        <div class="col-md-2" id ="area"></div>
+        <div class="col-md-2" id ="land"></div>
         <div class="col-md-4" id ="flags"></div>
         <div class="col-md-12" id="chart1"> <svg class="chart"></svg></div>
       </div>
@@ -177,14 +185,13 @@ if($pageWasRefreshed) {
 
   <script>
 
+//   function stuffToRezie(){
+//         var h_window = $(window).height();
+//         var h_map = h_window - 125;
+//         $('#map').css('height', h_map);
+// }
 
-  function stuffToRezie(){
-        var h_window = $(window).height();
-        var h_map = h_window - 125;
-        $('#map').css('height', h_map);
-}
-
-$(window).on("resize", stuffToRezie).trigger('resize'); 
+// $(window).on("resize", stuffToRezie).trigger('resize'); 
 //----------------setting up all variables-----------
     //counting site visits
     var counter = 0;
@@ -207,16 +214,16 @@ $(window).on("resize", stuffToRezie).trigger('resize');
     var flagged = false;   //boolean to check if flagging already occurred or not
     var token = <?php echo json_encode($_SESSION['token']); ?>;    //get tokens
     var session_key = <?php echo json_encode($_SESSION['array'][$_SESSION['count']]); ?>;
-    var session_array = <?php echo json_encode($_SESSION['array']); ?>;
     var controlOnMap = false;  // Boolean global variable used to control visiblity
     var drawnItems = new L.FeatureGroup(); // Create variable for Leaflet.draw features
     var secured = true; // Create default boolean for secured
     var defBid = 5; // default minimum bid 
+    var controlsVacant =false;
    
-    window.onresize = function() {
-       var width = document.getElementById('map').clientWidth;
-       console.log('flexwidth', width);
-    };
+    // window.onresize = function() {
+    //    var width = document.getElementById('map').clientWidth;
+    //    console.log('flexwidth', width);
+    // };
     
    
    // Add Tile Layer basemap
@@ -241,14 +248,42 @@ $(window).on("resize", stuffToRezie).trigger('resize');
 
 
 //------------------------ load scores---------------------
-    setInterval(getScores(),5000); //update getScores ever 5 seconds
+    //setInterval(getScores,5000, console.log('doesthiswork')); //update getScores ever 5 seconds. doesn't work?
+     var cont1 = document.getElementById('area');
+     var cont2 = document.getElementById('land');
+     getScores(cont1,cont2);
 
+ //  	var SQLquery2 = "SELECT current_owner,playercolor,sum(area) FROM data_game GROUP BY current_owner, playercolor";
+	// //console.log('are these all the usernames', myjson);
+
+	// function test(callback) {
+	// 	  $.getJSON("https://"+cartoDBusername+".carto.com/api/v2/sql?format=JSON&q="+SQLquery2, function (data) {
+	// 	    var container = document.getElementById('area');
+	// 	    container.innerHTML=("Area total: "+data.rows[0].sum);
+	// 	    //getDataCallback(data);
+	// 	    console.log('goddamiit1', data.rows[0].sum);
+	// 	  });
+	// }
+
+	// // function getDataCallback(data) {
+	// //   console.log('goddamiit2', data);
+	// // };
+
+	// test();
+	//console.log('goddamiit3', test());
+	//console.log('hello obj', obj);
 
 //------------------------ Functions---------------------
     //show controls when button 'vacant' is pressed
     function addButtons(){
+      if (controlsVacant==false){
       console.log(document.getElementById('controls'));
       $("#controls").show(300);
+      controlsVacant = true;
+    } else {
+      $("#controls").hide(300);
+      controlsVacant = false;
+    }
       //$.post("index-username.php", {"update": 10});
       //document.getElementById('controls').style.display = "block";
     }
@@ -269,8 +304,14 @@ $(window).on("resize", stuffToRezie).trigger('resize');
         return {
           'color': getColor(feature.properties.usage)
         };
-      }
+     }
 
+    jQuery(function($){
+     //OnClick testButton do a POST to a login.php with user and pasword
+      $("#btnToken").click(function(){
+       $.redirect("map.php", {tokenBool: "true"}, "POST"); 
+      });
+     });
 
 //------------------------ Function to load map ---------------------
     //get CARTO selection as geoJSON and add to leaflet map
@@ -284,56 +325,69 @@ $(window).on("resize", stuffToRezie).trigger('resize');
           onEachFeature: function(feature, layer) {
 
           //count flags of current player
-          if(layer.feature.properties.player1 === playername){
+          if(layer.feature.properties.current_owner === playername){
             console.log('flags', layer.feature.properties.no_falsified);
             flags2 = flags2 + layer.feature.properties.no_falsified
           }
 
             //this happens on each feature when flag is clicked
             layer.on('click', function () {
+              var modal=0;
+              var entry =0;
               $("#flag").show(300);
               $("#acquire").show(300);
+              $("#controls").hide(300);
               console.log('show cartodb id', feature.properties.cartodb_id);
 
               var globalX = feature.properties.cartodb_id;
               console.log('tis is this cartodbid', globalX);
 
-              // add a flag to a property when flag is clicked
+              // ---------------add a flag to a property when flag is clicked
               $('#flag').click(function addFlag(){
+
                 if (flagged==false){
                 //here again. store a $.getjson command in variable. htf?
                 //var globalX = 46;
-                var update = "UPDATE data_game SET no_falsified=no_falsified+1 WHERE cartodb_id="+globalX;
+                //var update2 = "UPDATE data_game SET no_falsified=no_falsified+1 WHERE cartodb_id="+globalX;
+
+                var update = "UPDATE data_game SET no_falsified=no_falsified+1 WHERE cartodb_id="+globalX+"; DELETE FROM data_game WHERE no_falsified>2";
+
                 submitToProxy(update);
                 console.log('show update', update);
                 alert("you just flagged a falsely classified property");
                 flagged=true;
                 console.log('id submitted', globalX);
                 
-              } else{
+                } else{
                 alert("you can't flag this twice, sorry");
-              }
-            })
+                };
+              });
 
+            // ---------------acquire------------
               //acquire property
               $('#acquire').click(function acquire(){
+                modal = document.getElementById('modalbody');
+                $("#ModalBuy").modal('show');
                 //pop up dialog how much do you want to bid? you need to bid at least 1 token. the more you bid, the less likely someone will take over your property.
                 var currentBid = feature.properties.bid_for + 1;
-
-                document.getElementById('spinnerLabel').innerHTML = "If you want to acquire this land, you need your minimum bid is " + currentBid + ". If you purchase a lot that has been flagged 3 or more times, her/his penalty will be transferred"; 
-
-                //problem: if page gets refreshed you ALWAYS gain 1 token that means your purchase is + 1. you should only gain tokens when you refresh without action.
-                function submitPurchase() {
                 var area = feature.properties.area;
-                var bid = document.getElementById("spinner").value;
-                //minimum value. minimum value equals area/10
-                //var bid = 30;
+                //var bid = document.getElementById("spinner").value;
+                entry = document.createElement('p');
+                var t = document.createTextNode("Your minimum bid is " + currentBid + " Tokens. Keep in mind that the more you bid the less likely someone will take it from you. If you purchase a lot that has been flagged 3 or more times, her/his penalty will be transferred");  
+                entry.appendChild(t);
+                modal.insertBefore(entry,modal.childNodes[0]);
+                console.log('this is modalbody on acquire buttonclick', modal);
+                //problem: if page gets refreshed you ALWAYS gain 1 token that means your purchase is + 1. you should only gain tokens when you refresh without action.
                 
                 //var spinner = e.options[e.selectedIndex].text;
                 console.log('current value', currentBid);
-
+ 
+ 
+			jQuery(function($){
                 //conditions: larger than token size. larger than mimium amount. non negative number.
-                if (bid<=token && bid>=currentBid){
+                $("#acquireBtn").click(function(e){
+                  var bid = document.getElementById("spinner").value;
+                  if (bid<=token && bid>=currentBid){
                   // var update = "UPDATE data_game SET bought_by="+ "'"+ playername +"'"+ ", bid_for="+ bid +"'"+", current_owner="+ playername +" WHERE cartodb_id="+globalX;
 
                   var update = "UPDATE data_game SET bought_by= '"+ playername +"' ,bid_for="+ bid +",current_owner= '"+ playername + "', playercolor='" + playercolor + "' WHERE cartodb_id="+globalX;
@@ -344,61 +398,48 @@ $(window).on("resize", stuffToRezie).trigger('resize');
                   console.log('tokencount', bid);
 
                   //update your area count and token count:
-                  postData( "index.php", {
-                    variable2: bid, //subtract purchase from token count
-                    variable3: area, //add area
-                    enteredName: playername
-                  });
+                  // postData( "index.php", {
+                  //   variable2: bid, //subtract purchase from token count
+                  //   variable3: area, //add area
+                  //   enteredName: playername
+                  // });
+
+                  $.redirect("map.php", {tokenMinus: bid}, "POST"); 
                   alert('this lot is yours now');
+                  $("#ModalBuy").modal('hide');
 
-                } else {
+                  } else {
                   alert('you bid more than you have tokens or less than required');
-                }
-
-                dialog2.dialog("close");
-
-              }
-
-              var dialog2 = $("#spinnerControls").dialog({
-                autoOpen: false,
-                height: 300,
-                width: 350,
-                modal: true,
-                position: {
-                  my: "center center",
-                  at: "center center",
-                  of: "#map"
-                },
-                buttons: {
-                    //setData is a function below
-                    "Acquire": submitPurchase,
-                    Cancel: function() {
-                      dialog2.dialog("close");
-                      //map.removeLayer(drawnItems);
-                    }
+                   //$("#ModalBuy").modal('hide');
                   }
+                  //$("#modalbody").children().remove();
+
                 });
+              });//-----------end aquire--------
 
-              dialog2.dialog('open');
+			});
+                $('#ModalBuy').on('hidden.bs.modal', function () {
+                  modal.removeChild(entry);
+                  console.log('modal when modal is closed',modal);
+                })
+            });//---------layer.on
 
-            })
-
-            });
-
+          
             layer.setStyle({
               color: feature.properties.playercolor
             });
 
             var label = L.marker(layer.getBounds().getCenter());
-            layer.bindPopup('<b>Discovered by:</b> ' + feature.properties.player1 + '<br> <b>Area:</b> ' + feature.properties.area + '<br><b>current owner:</b> ' + feature.properties.current_owner + '<br><b>Minimum bid:</b> '+ feature.properties.bid_for + '<br><b>For sale:</b> '+feature.properties.secured+'<br>' +feature.properties.no_falsified+' <i class="fas fa-flag"></i>'+'');
-          }
+            layer.bindPopup('<b>Discovered by:</b> ' + feature.properties.player1 + '<br> <b>Area:</b> ' + feature.properties.area + '<br><b>current owner:</b> ' + feature.properties.current_owner + '<br><b>Minimum bid:</b> '+ (feature.properties.bid_for+1) + '<br><b>For sale:</b> '+feature.properties.secured+'<br>' +feature.properties.no_falsified+' <i class="fas fa-flag"></i>'+'');
+          }//------on each feature
         }).addTo(map);
+        //----------end L.geojson()
         
-      console.log('array',flags2);
-      $('#flags').text('Flags: '+ flags2);
-      });
-};
+      // console.log('array',flags2);
+      // $('#flags').text('Flags: '+ flags2);
 
+      });
+    }
 
 //------------------------ load map on load---------------------
   $(document).ready(function() {
@@ -456,10 +497,12 @@ $(window).on("resize", stuffToRezie).trigger('resize');
       if ( !url || !data ) return;
       //data.cache = false;
       //data.timeStamp = new Date().getTime()
+      console.log("Loaded");
       $.post(url,
         data, function(d) {
-      //console.log(d);
-    });
+        console.log(d);
+        console.log("posted");
+      });
     }
 
 

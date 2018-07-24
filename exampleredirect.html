@@ -1,0 +1,18 @@
+<html>
+<head>
+    <!-- other headers -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="js/jquery.redirect.js"></script>
+    <script>
+     jQuery(function($){
+     //OnClick testButton do a POST to a login.php with user and pasword
+      $("#testButton").click(function(){
+       $.redirect("/login.php", {user: "johnDoe", password: "12345"}, "POST", "_blank"); 
+      });
+     });
+    </script>
+</head>
+<body>
+   <button id="testButton">Test Redirect</button>
+</body>
+</html>

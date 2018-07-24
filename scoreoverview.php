@@ -1,19 +1,9 @@
 <?php
 session_start();
 
-$pageWasRefreshed = isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] === 'max-age=0';
-$NoSearchPolys =5;
-
-//110 is length of points selected
-if($pageWasRefreshed) {
-    $_SESSION['token']++;
-    //echo $_SESSION['array'][$_SESSION['count']];
-    if ($_SESSION['count']< $NoSearchPolys){
-    $_SESSION['count']++;
-    } else {
-    $_SESSION['count']=0;
-    }
-  }
+if(isset($_POST['tokenMinusB'])){ //when user bought lot. could have been on map.php page but could not turn of automatic redirection
+  $_SESSION['token']=$_SESSION['token']-$_POST['tokenMinusB'];
+} 
 
 ?>
 
@@ -47,6 +37,7 @@ if($pageWasRefreshed) {
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="js/scores.js"></script>
+    <script src="js/jquery.redirect.js"></script>
 
        <!-- Bootstrap core JavaScript -->
     <!-- <script src="vendor/jquery/jquery.min.js"></script> -->
@@ -313,8 +304,8 @@ console.log('clientwidth', width);
 
        //if plot is classified as bought make opacity zero 
       function getOpacity(d) {
-        return d == true ? 1 :
-              d == false  ? 0.1:
+        return d == false ? 1 :
+              d == true  ? 0.1:
                 0.5;
       };
 
@@ -365,15 +356,19 @@ console.log('clientwidth', width);
                 selText = $(this).text();
                 console.log('value selected', selText);
                 //$(this).parents('.btn-group').find('.dropdown-toggle').html(selText+'<span class="caret"></span>');
-                $("#allSubmitBtn").click(function(e){
-                  var sql ="UPDATE data_game SET usage='"+selText+"', secured="+false+" WHERE cartodb_id="+globalX;
-                  console.log(sql)
-                  //this is the function that will submit the request to proxy. see line 170
-                  submitToProxy(sql);
-                  $("#myModal").modal('hide');
-                  $("#dropdownBuild").children().remove();
-                  console.log('this is the list', list);
+                jQuery(function($){
+                  $("#allSubmitBtn").click(function(e){
+                    var sql ="UPDATE data_game SET usage='"+selText+"', secured="+false+" WHERE cartodb_id="+globalX;
+                    console.log(sql)
+                    //this is the function that will submit the request to proxy. see line 170
+                    submitToProxy(sql);
+                    $.redirect("scoreoverview.php", {tokenMinusB: 5}, "POST"); 
+                    $("#myModal").modal('hide');
+                    $("#dropdownBuild").children().remove();
+                    console.log('building submitted to db and tokes deducted');
+                  });
                 });
+
               });
 
                 $('#myModal').on('hidden.bs.modal', function () {

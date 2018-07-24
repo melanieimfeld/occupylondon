@@ -11,7 +11,7 @@ if (empty($_SESSION['username'])){
 
 //110 is length of points selected
 if($pageWasRefreshed) {
-  //$_SESSION['token']++;
+  $_SESSION['token']++;
     //echo $_SESSION['array'][$_SESSION['count']];
   if ($_SESSION['count']< $NoSearchPolys){
     $_SESSION['count']++;
@@ -94,18 +94,18 @@ if($pageWasRefreshed) {
     </div>
  -->
      <!-- -----------------the dialog element (using modal) for acquiring--------------------- -->
-    <div class="modal fade" id="ModalBuy" role="dialog">
+    <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
     
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title"><i class="fa fa-shopping-cart" aria-hidden="true"></i>  Acquire someone elses lot</h4>
+          <h4 class="modal-title"><i class="fas fa-building"></i>  Secure your lot by building</h4>
         </div>
         <div class="modal-body" id="modalbody">
-         <!--  spinner  -->
-          <div id="spinnerControls">
+            <p>You can secure your lot from being bought by others by building something on it. Only the options that fulfil the area requirements are shown. Keep in mind your tokencount.</p>
+          <div id="spinnerControls" style="display:none">
             <label id="spinnerLabel" for="spinner"></label>
             <input id="spinner" type="number">
             <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
@@ -113,7 +113,7 @@ if($pageWasRefreshed) {
         </div>
         <div class="modal-footer">
           <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Cancel</button>
-          <button id="acquireBtn" class="btn btn-primary">Acquire!</button>
+          <button id="allSubmitBtn" class="btn btn-primary">Build!</button>
         </div>
       </div>
       
@@ -121,22 +121,21 @@ if($pageWasRefreshed) {
   </div>
 </div>
 
-
-    <!------------------------------- Navigation -------------------->
+    <!------------------------------- Navigation main-------------------->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
       <div class="container">
-        <button type="button" onclick="addButtons()" class="navbar-brand"><i class="fas fa-tree"></i> VACANT</button>
-        <button type="button" onclick="tokenOnReload()" class="btn btn-danger"><i class="fas fa-arrow-up"></i> SPOT ANOTHER</button>
-        <button type="button" href="scoreoverview.php" class="btn btn-danger"><i class="fas fa-building"></i> BUILD</button>
-  
+        <a class="navbar-brand" onclick="addButtons()" value="addbuttons" style="cursor:pointer">VACANT</a>
+        <a class="navbar-brand" onclick="window.location.reload()" style="cursor:pointer">SPOT ANOTHER</a>
+        <a class="navbar-brand" style="cursor:pointer"><i class="fas fa-arrow-up"></i> BUILD</a>
+    <!------------------------------- on layer click -------------------->
         <a id='flag' class="navbar-brand" style="display:none; cursor:pointer">FLAG</a>
         <a id='acquire' class="navbar-brand" style="display:none; cursor:pointer">ACQUIRE ME</a>
 
         <!--------------------- these are the control buttons for drawing (new)----------------------->
         <div id="controls" style="display:none">
-          <button class="btn btn-primary" id="startBtn" aria-hidden="true">start mapping</button>
-          <button class="btn btn-primary" id="deleteBtn" aria-hidden="true">delete</button>
-          <button class="btn btn-primary" id="saveBtn" aria-hidden="true">claim</button>
+          <a id="startBtn" class="navbar-brand" style="cursor:pointer">start mapping</a>
+          <a id="deleteBtn" class="navbar-brand" style="cursor:pointer">delete</a>
+          <a id="saveBtn" class="navbar-brand" style="cursor:pointer">claim this land</a>
         </div>
         <!--------------------- all the rest in navbar ----------------------->       
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
@@ -145,12 +144,15 @@ if($pageWasRefreshed) {
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item active">
-              <a class="nav-link" href="logout.php">Logout
+              <a class="nav-link" href="scoreoverview.php">Score overview
                 <span class="sr-only">(current)</span>
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">Rules</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="logout.php">Logout</a>
             </li>
           </ul>
         </div>
@@ -176,13 +178,14 @@ if($pageWasRefreshed) {
 
   <script>
 
-//   function stuffToRezie(){
-//         var h_window = $(window).height();
-//         var h_map = h_window - 125;
-//         $('#map').css('height', h_map);
-// }
 
-// $(window).on("resize", stuffToRezie).trigger('resize'); 
+  function stuffToRezie(){
+        var h_window = $(window).height();
+        var h_map = h_window - 125;
+        $('#map').css('height', h_map);
+}
+
+$(window).on("resize", stuffToRezie).trigger('resize'); 
 //----------------setting up all variables-----------
     //counting site visits
     var counter = 0;
@@ -210,12 +213,11 @@ if($pageWasRefreshed) {
     var drawnItems = new L.FeatureGroup(); // Create variable for Leaflet.draw features
     var secured = true; // Create default boolean for secured
     var defBid = 5; // default minimum bid 
-    var controlsVacant =false;
    
-    // window.onresize = function() {
-    //    var width = document.getElementById('map').clientWidth;
-    //    console.log('flexwidth', width);
-    // };
+    window.onresize = function() {
+       var width = document.getElementById('map').clientWidth;
+       console.log('flexwidth', width);
+    };
     
    
    // Add Tile Layer basemap
@@ -240,20 +242,14 @@ if($pageWasRefreshed) {
 
 
 //------------------------ load scores---------------------
-    //setInterval(getScores,5000, console.log('doesthiswork')); //update getScores ever 5 seconds. doesn't work?
+    setInterval(getScores(),5000); //update getScores ever 5 seconds
 
 
 //------------------------ Functions---------------------
     //show controls when button 'vacant' is pressed
     function addButtons(){
-      if (controlsVacant==false){
       console.log(document.getElementById('controls'));
       $("#controls").show(300);
-      controlsVacant = true;
-    } else {
-      $("#controls").hide(300);
-      controlsVacant = false;
-    }
       //$.post("index-username.php", {"update": 10});
       //document.getElementById('controls').style.display = "block";
     }
@@ -276,15 +272,6 @@ if($pageWasRefreshed) {
         };
       }
 
-    //doesn't work at the moment. 
-    function tokenOnReload(){
-      postData( "index.php", {
-      variable2: -1,
-      enteredName: playername
-      });
-      location.reload(); 
-    }
-
 
 //------------------------ Function to load map ---------------------
     //get CARTO selection as geoJSON and add to leaflet map
@@ -298,26 +285,22 @@ if($pageWasRefreshed) {
           onEachFeature: function(feature, layer) {
 
           //count flags of current player
-          if(layer.feature.properties.current_owner === playername){
+          if(layer.feature.properties.player1 === playername){
             console.log('flags', layer.feature.properties.no_falsified);
             flags2 = flags2 + layer.feature.properties.no_falsified
           }
 
             //this happens on each feature when flag is clicked
             layer.on('click', function () {
-              var modal=0;
-              var entry =0;
               $("#flag").show(300);
               $("#acquire").show(300);
-              $("#controls").hide(300);
               console.log('show cartodb id', feature.properties.cartodb_id);
 
               var globalX = feature.properties.cartodb_id;
               console.log('tis is this cartodbid', globalX);
 
-              // ---------------add a flag to a property when flag is clicked
+              // add a flag to a property when flag is clicked
               $('#flag').click(function addFlag(){
-
                 if (flagged==false){
                 //here again. store a $.getjson command in variable. htf?
                 //var globalX = 46;
@@ -328,34 +311,30 @@ if($pageWasRefreshed) {
                 flagged=true;
                 console.log('id submitted', globalX);
                 
-                } else{
+              } else{
                 alert("you can't flag this twice, sorry");
-                };
-              });
+              }
+            })
 
-            // ---------------acquire------------
               //acquire property
               $('#acquire').click(function acquire(){
-                modal = document.getElementById('modalbody');
-                $("#ModalBuy").modal('show');
                 //pop up dialog how much do you want to bid? you need to bid at least 1 token. the more you bid, the less likely someone will take over your property.
                 var currentBid = feature.properties.bid_for + 1;
-                var area = feature.properties.area;
-                //var bid = document.getElementById("spinner").value;
-                entry = document.createElement('p');
-                var t = document.createTextNode("If you want to acquire this land, you need your minimum bid is " + currentBid + ". Keep in mind that the more you bid the less likely someone will take it from you. If you purchase a lot that has been flagged 3 or more times, her/his penalty will be transferred");  
-                entry.appendChild(t);
-                modal.insertBefore(entry,modal.childNodes[0]);
-                console.log('this is modalbody on acquire buttonclick', modal);
+
+                document.getElementById('spinnerLabel').innerHTML = "If you want to acquire this land, you need your minimum bid is " + currentBid + ". If you purchase a lot that has been flagged 3 or more times, her/his penalty will be transferred"; 
+
                 //problem: if page gets refreshed you ALWAYS gain 1 token that means your purchase is + 1. you should only gain tokens when you refresh without action.
+                function submitPurchase() {
+                var area = feature.properties.area;
+                var bid = document.getElementById("spinner").value;
+                //minimum value. minimum value equals area/10
+                //var bid = 30;
                 
                 //var spinner = e.options[e.selectedIndex].text;
                 console.log('current value', currentBid);
 
                 //conditions: larger than token size. larger than mimium amount. non negative number.
-                $("#acquireBtn").click(function(e){
-                  var bid = document.getElementById("spinner").value;
-                  if (bid<=token && bid>=currentBid){
+                if (bid<=token && bid>=currentBid){
                   // var update = "UPDATE data_game SET bought_by="+ "'"+ playername +"'"+ ", bid_for="+ bid +"'"+", current_owner="+ playername +" WHERE cartodb_id="+globalX;
 
                   var update = "UPDATE data_game SET bought_by= '"+ playername +"' ,bid_for="+ bid +",current_owner= '"+ playername + "', playercolor='" + playercolor + "' WHERE cartodb_id="+globalX;
@@ -372,38 +351,55 @@ if($pageWasRefreshed) {
                     enteredName: playername
                   });
                   alert('this lot is yours now');
-                  $("#ModalBuy").modal('hide');
 
-                  } else {
+                } else {
                   alert('you bid more than you have tokens or less than required');
-                   //$("#ModalBuy").modal('hide');
+                }
+
+                dialog2.dialog("close");
+
+              }
+
+              var dialog2 = $("#spinnerControls").dialog({
+                autoOpen: false,
+                height: 300,
+                width: 350,
+                modal: true,
+                position: {
+                  my: "center center",
+                  at: "center center",
+                  of: "#map"
+                },
+                buttons: {
+                    //setData is a function below
+                    "Acquire": submitPurchase,
+                    Cancel: function() {
+                      dialog2.dialog("close");
+                      //map.removeLayer(drawnItems);
+                    }
                   }
-                  //$("#modalbody").children().remove();
-
                 });
-              });//-----------end aquire--------
-                $('#ModalBuy').on('hidden.bs.modal', function () {
-                  modal.removeChild(entry);
-                  console.log('modal when modal is closed',modal);
-                })
-            });//---------layer.on
 
-          
+              dialog2.dialog('open');
+
+            })
+
+            });
+
             layer.setStyle({
               color: feature.properties.playercolor
             });
 
             var label = L.marker(layer.getBounds().getCenter());
             layer.bindPopup('<b>Discovered by:</b> ' + feature.properties.player1 + '<br> <b>Area:</b> ' + feature.properties.area + '<br><b>current owner:</b> ' + feature.properties.current_owner + '<br><b>Minimum bid:</b> '+ feature.properties.bid_for + '<br><b>For sale:</b> '+feature.properties.secured+'<br>' +feature.properties.no_falsified+' <i class="fas fa-flag"></i>'+'');
-          }//------on each feature
+          }
         }).addTo(map);
-        //----------end L.geojson()
         
-      // console.log('array',flags2);
-      // $('#flags').text('Flags: '+ flags2);
-
+      console.log('array',flags2);
+      $('#flags').text('Flags: '+ flags2);
       });
-    }
+};
+
 
 //------------------------ load map on load---------------------
   $(document).ready(function() {

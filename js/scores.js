@@ -18,8 +18,8 @@
 
 // pass a function to map (scale values)
   var values2 = values.map(x => x * 0.01);
-  console.log(values2);
-  console.log(values);
+  //console.log(values2);
+  //console.log(values);
 
   var x = d3.scaleLinear()
       .domain([0, d3.max(values2)])
@@ -66,13 +66,14 @@
   };
 
 
+
 //this function load summary stats on load
-function getScores(){
-  var SQLquery2 = "SELECT current_owner,playercolor,sum(area) FROM data_game GROUP BY current_owner, playercolor";
+function getScores(elem1, elem2){
+  var SQLquery2 = "SELECT current_owner,playercolor,sum(area),count(area) FROM data_game GROUP BY current_owner, playercolor";
+  //reset tokens if user has more than one flag on a lot?
   var names=[];
   var scores=[];
   var colors=[];
-  //reset tokens if user has more than one flag on a lot?
 
    $.getJSON("https://"+cartoDBusername+".carto.com/api/v2/sql?format=JSON&q="+SQLquery2, function(data){
       //console.log('this is the new query', data.rows.length);
@@ -83,10 +84,14 @@ function getScores(){
         scores.push(data.rows[i].sum);
         colors.push(data.rows[i].playercolor);
      }
-     console.log('those are the colors', colors);
+     console.log(data);
+      elem1.innerHTML=("Area total: "+data.rows[0].sum);
+      elem2.innerHTML=("Lots total: "+data.rows[0].count);
       barGraph(scores,names,colors);
-
+     
+      
   });
 };
+
 
 
