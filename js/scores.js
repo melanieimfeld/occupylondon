@@ -13,7 +13,7 @@
 
   // var width = 600,
   var width = document.getElementById('chart1').clientWidth-20,
-  barHeight = 20;
+  barHeight = 25;
   
 
 // pass a function to map (scale values)
@@ -53,8 +53,9 @@
       .attr("dy", "-.2em") //y position of text
       //display 1 decimal
       .text(function(text, i){return text})
-      .style("font-size", '9px')
-      .style("fill", "white");
+      .style("font-size", '10px')
+      .style("font-weight", "bold")
+      .style("fill", "#f05742");
 
   //append the title
   // bar.append("text")           
@@ -74,8 +75,8 @@ function getScores(elem1, elem2){
   var names=[];
   var scores=[];
   var colors=[];
-  var myArr = [];
 
+ 
    $.getJSON("https://"+cartoDBusername+".carto.com/api/v2/sql?format=JSON&q="+SQLquery2, function(data){
       //console.log('this is the new query', data.rows.length);
       //console.log('this is the new query', data.rows[0]);
@@ -84,25 +85,47 @@ function getScores(elem1, elem2){
         names.push(data.rows[i].current_owner);
         scores.push(data.rows[i].sum);
         colors.push(data.rows[i].playercolor);
+
         if (data.rows[i].current_owner == playername){
           console.log('match found in user db');
-          myArr.push({
-              area: data.rows[i].sum,
-              land: data.rows[i].count
-          });
-        } else { //user hasn't classified anything and is therefore not in db
-          console.log('no match found in user db');
-          myArr.push({
-              area: 0,
-              land: 0
-          });
+          myScore['area']= data.rows[i].sum;
+          myScore['land']= data.rows[i].count;
         }
-     }
-      console.log('show me all compliled data', data);
-      console.log('show me all user specific data', myArr);
+      }
+
+//         for (var c=0; c<namedb.length; c++) {
+//           if (namedb.charCodeAt(c) != playername.charCodeAt(c)) {
+//               console.log('if charCode unequal this should pop up',namedb.charCodeAt(c),playername.charCodeAt(c));
+//           }
+// }
+   
+    
+      //console.log('show me the username from db', data.rows[i].current_owner, typeof(data.rows[i].current_owner));
+
+        // if (data.rows[i].current_owner == playername){
+        //   console.log('match found in user db');
+        //   myArr.push({
+        //       area: data.rows[i].sum,
+        //       land: data.rows[i].count
+        //   });
+        // } else { //user hasn't classified anything and is therefore not in db
+        //   console.log('no match found in user db');
+        //   myArr.push({
+        //       area: 0,
+        //       land: 0
+        //   });
+        // }
+      // if(names.includes(playername)==false){
+      //   console.log('yes youre new');
+      //   myArr.push({
+      //     area: 0,
+      //     land: 0
+      //   });
+
+      // };
       
-      elem1.innerHTML=("Your area total: "+myArr[0].area);
-      elem2.innerHTML=("Your lots total: "+myArr[0].land);
+      elem1.innerHTML=("Your area: "+myScore.area);
+      elem2.innerHTML=("Your lots: "+myScore.land);
       barGraph(scores,names,colors);
       
   });

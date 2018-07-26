@@ -4,14 +4,16 @@ body {
       /*padding: 0;
       margin: 0;*/
       font: 100% 'Roboto', 'Helvetica Neue', Helvetica, sans-serif;
-      background-color: #faccc6;
+      background-color: #cfead9;
+      background-image: none;
+    /*  padding-bottom: : 30px; need to find a way to get container from under navbar*/
       }
 
 html, body, #map {
       height: 100%;
       width: 100%;
       color: #f05742 !important;
-        }
+      }
 
 
 /*#map2 {
@@ -20,16 +22,34 @@ html, body, #map {
       }*/
 
 .bg-dark {
-background-color: #faccc6 !important;
+background-color: #a9dabb !important;
 }
 /*#map {
   position:absolute;
 }
 */
 
-/*a:hover { 
-    background-color: #f48171;
-}*/
+.row {
+background-color: #cfead9 !important;
+}
+
+
+#dropdownBuild{
+  color: #f05742 !important;
+}
+
+a { 
+  color: #f05742 !important;
+}
+
+hr{
+ /* height:2px;*/
+  border-color:#f05742;
+  background-color:#f05742;
+  color:#f05742;
+  border-style:solid;
+  line-height:0.3em;
+}
 
 #form {
   margin-top: 5px;
@@ -53,7 +73,7 @@ background-color: #faccc6 !important;
 }
 
 #dialog{
-  background-color: #faccc6;
+  background-color: #cfead9;
   font: 100% 'Oswald', 'Helvetica Neue', Helvetica, sans-serif !important;
 }
 
@@ -118,7 +138,8 @@ background-color: #faccc6 !important;
 }
 
 .btn {
-/*  margin: 0 auto !important;*/
+  background-color: #3caead;
+  border-color: #3caead;
 }
 
 .table {

@@ -114,7 +114,6 @@ if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
         </div>
         <div class="modal-body" id="modalbody">
          <!--  spinner  -->
-          <p id="acquireText"></p>
           <div id="spinnerControls">
             <label id="spinnerLabel" for="spinner"></label>
             <input id="spinner" type="number">
@@ -217,11 +216,9 @@ if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
     var controlOnMap = false;  // Boolean global variable used to control visiblity
     var drawnItems = new L.FeatureGroup(); // Create variable for Leaflet.draw features
     var secured = true; // Create default boolean for secured
-    var defBid = 1; // default minimum bid 
+    var defBid = 5; // default minimum bid 
     var controlsVacant =false;
     var myScore = {area:0, land:0}; //empty array to hold displayed scores
-    var flagDefault = 0; 
-
    
     // window.onresize = function() {
     //    var width = document.getElementById('map').clientWidth;
@@ -290,14 +287,11 @@ if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
       if (controlsVacant==false){
       console.log(document.getElementById('controls'));
       $("#controls").show(300);
-      $("#flag").hide(300);
-      $("#acquire").hide(300);
       controlsVacant = true;
     } else {
       $("#controls").hide(300);
       controlsVacant = false;
     }
-      console.log('status of controls', controlsVacant);
       //$.post("index-username.php", {"update": 10});
       //document.getElementById('controls').style.display = "block";
     }
@@ -323,7 +317,7 @@ if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
          //if plot is classified as bought make opacity zero 
     function getOpacity(d) {
         return d == false ? 1 :
-              d == true  ? 0.3:
+              d == true  ? 0.1:
                 0.5;
     };
 
@@ -338,24 +332,109 @@ if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
     //get CARTO selection as geoJSON and add to leaflet map
     function getGeoJSON(){
       $.getJSON("https://"+cartoDBusername+".carto.com/api/v2/sql?format=GeoJSON&q="+SQLquery, function(data){
-       
+
         cartoDBpoints=L.geoJson(data, {
           style:hStyle,
-          onEachFeature: onEachFeature
-        }).addTo(map);
+          onEachFeature: function(feature, layer) {
+            //console.log('feature', feature, typeof(feature));
+            //console.log('layer', layer, typeof(layer));
+
+            //this happens on each feature when flag is clicked
+   //          layer.on('popupopen', function () {
+   //            var modal=0;
+   //            var entry =0;
+   //            var area = feature.properties.area;
+   //            var globalX = feature.properties.cartodb_id;
+   //            console.log('tis is this cartodbid', globalX);
+
+   //            $("#flag").show(300);
+   //            $("#acquire").show(300);
+   //            $("#controls").hide(300);
+   //            //console.log('show cartodb id', feature.properties.cartodb_id);
+
+   //            // ---------------add a flag to a property when flag is clicked
+   //            $('#flag').click(function addFlag(){
+
+   //              if (flagged==false){
+   //              //here again. store a $.getjson command in variable. htf?
+   //              //var globalX = 46;
+   //              //var update2 = "UPDATE data_game SET no_falsified=no_falsified+1 WHERE cartodb_id="+globalX;
+
+   //              var update = "UPDATE data_game SET no_falsified=no_falsified+1 WHERE cartodb_id="+globalX+"; DELETE FROM data_game WHERE no_falsified>2";
+
+   //              submitToProxy(update);
+   //              console.log('show update', update);
+   //              alert("you just flagged a falsely classified property");
+   //              flagged=true;
+   //              console.log('id submitted', globalX);
+                
+   //              } else{
+   //              alert("you can't flag this twice, sorry");
+   //              };
+   //            });
+
+   //          // ---------------acquire------------
+   //            //acquire property
+   //            $('#acquire').click(function acquire(){
+   //              modal = document.getElementById('modalbody');
+   //              $("#ModalBuy").modal('show');
+   //              //pop up dialog how much do you want to bid? you need to bid at least 1 token. the more you bid, the less likely someone will take over your property.
+   //              var currentBid = feature.properties.bid_for + 1;
+   //              //var bid = document.getElementById("spinner").value;
+   //              entry = document.createElement('p');
+   //              var t = document.createTextNode("Your minimum bid is " + currentBid + " Tokens. Keep in mind that the more you bid the less likely someone will take it from you. If you purchase a lot that has been flagged 3 or more times, her/his penalty will be transferred");  
+   //              entry.appendChild(t);
+   //              modal.insertBefore(entry,modal.childNodes[0]);
+   //              console.log('this is modalbody on acquire buttonclick', modal);
+   //              //problem: if page gets refreshed you ALWAYS gain 1 token that means your purchase is + 1. you should only gain tokens when you refresh without action.
+                
+   //              //var spinner = e.options[e.selectedIndex].text;
+   //              console.log('current value', currentBid);
+ 
+ 
+			//          jQuery(function($){
+   //              //conditions: larger than token size. larger than mimium amount. non negative number.
+   //              $("#acquireBtn").click(function(e){
+   //                var bid = document.getElementById("spinner").value;
+   //                if (bid<=token && bid>=currentBid){
+   //                // var update = "UPDATE data_game SET bought_by="+ "'"+ playername +"'"+ ", bid_for="+ bid +"'"+", current_owner="+ playername +" WHERE cartodb_id="+globalX;
+
+   //                var update = "UPDATE data_game SET bought_by= '"+ playername +"' ,bid_for="+ bid +",current_owner= '"+ playername + "', playercolor='" + playercolor + "' WHERE cartodb_id="+globalX;
+                  
+   //                console.log('this was submitted upon purchase', update);
+   //                submitToProxy(update);
+   //                console.log('this was submitted upon purchase', update);
+   //                console.log('tokencount', bid);
+
+   //                //update your area count and token count:
+   //                // postData( "index.php", {
+   //                //   variable2: bid, //subtract purchase from token count
+   //                //   variable3: area, //add area
+   //                //   enteredName: playername
+   //                // });
+
+   //                $.redirect("map.php", {tokenMinus: bid}, "POST"); 
+   //                alert('this lot is yours now');
+   //                $("#ModalBuy").modal('hide');
+
+   //                } else {
+   //                alert('you bid more than you have tokens or less than required');
+   //                 //$("#ModalBuy").modal('hide');
+   //                }
+   //                //$("#modalbody").children().remove();
+
+   //              });
+   //            });//-----------end aquire--------
+
+			// });
+   //              $('#ModalBuy').on('hidden.bs.modal', function () {
+   //                modal.removeChild(entry);
+   //                console.log('modal when modal is closed',modal);
+   //              })
+
+   //          });//---------layer.on
+
           
-      });
-    };
-
-
-//------------------------ function on each layer---------------------
-        function onEachFeature(feature, layer) {
-            var flagged=false;
-            //bind click
-              layer.on({
-                  click: whenClicked
-              });
-
             layer.setStyle({
               color: feature.properties.playercolor,
               fillOpacity: getOpacity(feature.properties.secured)
@@ -363,105 +442,24 @@ if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
 
             var label = L.marker(layer.getBounds().getCenter());
             layer.bindPopup('<b>Discovered by:</b> ' + feature.properties.player1 + '<br> <b>Area:</b> ' + feature.properties.area + '<br><b>current owner:</b> ' + feature.properties.current_owner + '<br><b>Minimum bid:</b> '+ (feature.properties.bid_for+1) + '<br><b>For sale:</b> '+feature.properties.secured+'<br>' +feature.properties.no_falsified+' <i class="fas fa-flag"></i>'+'');
-
-        }
-
-//------------------------ function when clicked---------------------
-    function whenClicked(e) {
-          var layerID = e.target.feature.properties.cartodb_id;
-          var sec = e.target.feature.properties.secured;
-          console.log('cartobd id of clicked',e.target.feature.properties.cartodb_id);
-
-           if(sec) { //only show controls if lot is 'acquirable'
-                    $("#flag").show(300);
-                    $("#acquire").show(300);
-                    controlsVacant = false;
-                } else {
-                    $("#acquire").hide(300);
-                    $("#flag").hide(300);
-               }
-
-    //------------------------ flagging---------------------
-           $('#flag').click(function addFlag(event){
-            console.log("this is inside flag button");
-                
-                if (flagged!=true){
-
-                var update = "UPDATE data_game SET no_falsified=no_falsified+1 WHERE cartodb_id="+layerID+"; DELETE FROM data_game WHERE no_falsified>2";
-
-                submitToProxy(update);
-                console.log('show update', update);
-                alert("you just flagged a falsely classified property");
-                flagged=true;
-                console.log('id submitted', layerID);
-                } 
-
-            });
-        if (flagged==true){
-          alert("you can only flag once per session, sorry");
-        }
-    //------------------------ aquiring---------------------
-             $('#acquire').off('click').click(function acquire(ev){ //???????
-                modal = document.getElementById('modalbody'); //the modal to append elements to
-                var currentBid = e.target.feature.properties.bid_for + 1;
-                var bid = document.getElementById("spinner").value;
-         
-
-                $("#ModalBuy").modal('show');
-
-                console.log('this is modalbody when acquire is clicked', modal);
-   
-                //pop up dialog how much do you want to bid? you need to bid at least 1 token. the more you bid, the less likely someone will take over your property.
+          }//------on each feature
+        }).addTo(map);//----------end L.geojson()
     
-                //entry = document.createElement('p');
-                //entry.className = "par";
-                $('#acquireText').text("Your minimum bid is " + currentBid + " Tokens. The higher the amount of tokens you bid, the more protected your lot is from another bid. Fill in your bid here:");
-                //entry.appendChild(t);
-                //modal.insertBefore(entry,modal.childNodes[0]);
-                //problem: if page gets refreshed you ALWAYS gain 1 token that means your purchase is + 1. you should only gain tokens when you refresh without action.
-                
-                //var spinner = e.options[e.selectedIndex].text;
-                console.log('current value', currentBid);
 
-               jQuery(function($){
-                //conditions: larger than token size. larger than mimium amount. non negative number.
-                $("#acquireBtn").off('click').click(function(e){
-                  console.log('this is modalbody when acquire button is clicked', modal);
-                  //e.stopPropagation();
-                  var bid = document.getElementById("spinner").value;
-                  if (bid<=token && bid>=currentBid){
-                  // var update = "UPDATE data_game SET bought_by="+ "'"+ playername +"'"+ ", bid_for="+ bid +"'"+", current_owner="+ playername +" WHERE cartodb_id="+globalX;
+            cartoDBpoints.on("click", function (event) {
+              var clickedMarker = event.layer;
+              console.log('what is event layer here', event.layer);
+              console.log('what is cartodb here', cartoDBpoints._layers);
+              // do some stuff…
+          });
 
-                  var update = "UPDATE data_game SET bought_by= '"+ playername +"' ,bid_for="+ bid +",current_owner= '"+ playername + "', playercolor='" + playercolor + "' WHERE cartodb_id="+layerID;
-                  
-                  submitToProxy(update);
-                  console.log('this was submitted upon purchase', update);
-                  console.log('tokencount', bid);
 
-                  $.redirect("map.php", {tokenMinus: bid}, "POST"); 
-                  alert('this lot is yours now');
-                  $("#ModalBuy").modal('hide');
+      // console.log('array',flags2);
+      // $('#flags').text('Flags: '+ flags2);
 
-                  } else {
-                  alert('you bid more than you have tokens or less than required');
-                  $("#ModalBuy").modal('hide');
-                  }
-           
-                });
-              });
-                        $('#ModalBuy').on('hidden.bs.modal', function () {
-                          //modal.removeChild(entry);
-                          //$('.par').remove();
-                          console.log('modal when modal is closed',modal);                
-                          $("#flag").hide(300);
-                          $("#acquire").hide(300);
-                        })
+      });
+    };
 
-      });//-----------end aquire--------
-             
-    } //end of function when clicked
-
-//------------------------ other stuff---------------------
 function getSearchArea(){
       $.getJSON("./data/points_selected.geojson",{contentType: "application/json; charset=UTF-8"},function(data){
         // add GeoJSON layer to the map once the file is loaded
@@ -653,6 +651,9 @@ function setData() {
     var unixTime = Math.floor(Date.now() / 1000);
     //console.log(unixTime);
     var area = Math.round(L.GeometryUtil.geodesicArea(layer.getLatLngs()));
+
+    var flagDefault = 0; 
+
     console.log('playername',playername);
     //console.log('search poly',search_poly);
 

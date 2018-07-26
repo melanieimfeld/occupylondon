@@ -1,6 +1,10 @@
 <?php
 session_start();
 
+if (empty($_SESSION['username'])){
+   header("Location: index.php");
+}
+
 if(isset($_POST['tokenMinusB'])){ //when user bought lot. could have been on map.php page but could not turn of automatic redirection
   $_SESSION['token']=$_SESSION['token']-$_POST['tokenMinusB'];
 } 
@@ -105,20 +109,17 @@ if(isset($_POST['tokenMinusB'])){ //when user bought lot. could have been on map
 
 
     <!-- -----------------the dialog element for acquiring--------------------- -->
-    <div id="spinnerControls" style="display:none">
+<!--     <div id="spinnerControls" style="display:none">
       <label id="spinnerLabel" for="spinner"></label>
       <input id="spinner" type="number">
       <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
     </div>
-
+ -->
     <!------------------------------- Navigation -------------------->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
       <div class="container">
-        <a class="navbar-brand" href="map.php"><button type="button" href="map.php" class="btn btn-primary">SPOT MORE</button></a>
-        <a class="navbar-brand" style="cursor:pointer"><i class="fas fa-arrow-up"></i> BUILD</a>
-        <a id='flag' class="navbar-brand" style="display:none; cursor:pointer">FLAG</a>
-        <a id='acquire' class="navbar-brand" style="display:none; cursor:pointer">ACQUIRE ME</a>
-
+        <a class="navbar-brand" href="map.php" style="cursor:pointer"><i class="fas fa-arrow-left"></i> SPOT MORE</a>
+    
         <!--------------------- these are the control buttons for drawing (new)----------------------->
         <div id="controls" style="display:none">
           <a id="startBtn" class="navbar-brand" style="cursor:pointer">start mapping</a>
@@ -147,10 +148,9 @@ if(isset($_POST['tokenMinusB'])){ //when user bought lot. could have been on map
       </div>
     </nav>
     <!--------------------- this is the container with land and tokens ----------------------->  
-    <div class="container-fluid">
-
+  <div class="container-fluid" id="test">
     <div class="row">
-        <div class="col-md-5" id="chart1">
+      <div class="col-md-5" id="chart1">
           <h3 class="mt-3">Building options</h3>
           <table class="table table-hover" style="width:100%">
             <tr>
@@ -200,6 +200,7 @@ if(isset($_POST['tokenMinusB'])){ //when user bought lot. could have been on map
             </tr>
           </table>
           <svg class="chart"></svg>
+          <hr>
           <div class="row">
             <div class="col-md-4"></span>Your tokens: <?php echo htmlspecialchars($_SESSION['token'])?> </div>
             <div class="col-md-4" id ="area"></div>
@@ -222,7 +223,7 @@ if(isset($_POST['tokenMinusB'])){ //when user bought lot. could have been on map
 
 function stuffToResize(){
         var h_window = $(window).height();
-        var h_map = h_window - 70;
+        var h_map = h_window;
         $('#map').css('height', h_map);
 }
 
@@ -268,6 +269,7 @@ console.log('clientwidth', width);
 
      // Create Leaflet map object
     var map = L.map('map',{ center: [51.5310, 0.1007], zoom: 15, zoomControl:true});
+    var myScore = {area:0, land:0}; //empty array to hold displayed scores
 
     var cont1 = document.getElementById('area');
     var cont2 = document.getElementById('land');
