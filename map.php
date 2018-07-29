@@ -2,7 +2,7 @@
 session_start();
 
 $pageWasRefreshed = isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] === 'max-age=0';
-$NoSearchPolys =5;
+$NoSearchPolys =99;
 
 //if no username was defined send user back to login page
 if (empty($_SESSION['username'])){
@@ -20,15 +20,24 @@ if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
   	}
 //echo $counter+1;
 } elseif(isset($_POST['tokenMinus'])){ //user acquired another lot or bought something
-	echo 'Session var before operation '.$_SESSION['token'];
+	//echo 'Session var before operation '.$_SESSION['token'];
 	$_SESSION['token']=$_SESSION['token']-$_POST['tokenMinus'];
-	echo 'Session var after operation '.$_SESSION['token'];
-	echo 'bid '.$_POST['tokenMinus'];
+	//echo 'Session var after operation '.$_SESSION['token'];
+	//echo 'bid '.$_POST['tokenMinus'];
 } elseif (!isset($_SESSION['token'])) { //this should only happen when user just entered the game
     $_SESSION['token']=0;
     $_SESSION['count']=0;
-    echo 'else statement, reason why token turns zero?'.$_SESSION['token']; 
+    //echo 'else statement, reason why token turns zero?'.$_SESSION['token']; 
 }
+
+// if(isset($_SERVER['HTTP_REFERER'])){
+//   $loc =  parse_url ($_SERVER['HTTP_REFERER']);
+//   print_r($loc);
+// } else {
+//   $loc = "something";
+// }
+
+// echo $_SERVER['HTTP_REFERER']
 
 ?>
 
@@ -73,35 +82,7 @@ if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
 </head>
 
 <body>
-  <!-- -----------------the dialog element for submission--------------------- -->
-  <div id="dialog" title="Property Information" style="display:none">     
-    <form>
-      <fieldset style="border: none;">
-        <ul style="list-style-type: none; padding-left: 0px">
-            <li><label for="usage">What would you build here?</label></li>
-            <li><select for="usage" id="usage">
-              <option value="Housing" class="text ui-widget-content ui-corner-all">Affordable Housing</option>
-              <option value="Retail" class="text ui-widget-content ui-corner-all">A shopping temple</option>
-              <option value="Home" class="text ui-widget-content ui-corner-all">My own home</option>
-              <option value="Garden" class="text ui-widget-content ui-corner-all">A community garden</option>
-              <option value="Bar" class="text ui-widget-content ui-corner-all">A pop up bar</option>
-              <option value="School" class="text ui-widget-content ui-corner-all">A school</option>
-              <option value="other" class="text ui-widget-content ui-corner-all">I have another idea</option>
-            </select></li>
 
-          </ul>
-          <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-        </fieldset>
-      </form>
-    </div>
-
-    <!-- -----------------the dialog element for acquiring--------------------- -->
-  <!--   <div id="spinnerControls" style="display:none">
-      <label id="spinnerLabel" for="spinner"></label>
-      <input id="spinner" type="number">
-      <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-    </div>
- -->
      <!-- -----------------the dialog element (using modal) for acquiring--------------------- -->
     <div class="modal fade" id="ModalBuy" role="dialog">
     <div class="modal-dialog">
@@ -131,12 +112,13 @@ if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
   </div>
 </div>
 
-    <!------------------------------- Navigation -------------------->
+            <!------------------------------- Navigation -------------------->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
       <div class="container">
-      	<a class="navbar-brand" onclick="addButtons()" value="addbuttons" style="cursor:pointer"><i class="fas fa-tree"></i> VACANT</a>
-        <a class="navbar-brand" id="btnToken" style="cursor:pointer"><i class="fas fa-arrow-up"></i> SPOT ANOTHER</a>
+      	<a class="navbar-brand" onclick="addButtons()" value="addbuttons" style="cursor:pointer"><i class="fas fa-pen"></i> MAP VACANT</a>
+        <a class="navbar-brand" id="btnToken" style="cursor:pointer"><i class="fas fa-search"></i> SPOT ANOTHER</a>
         <a class="navbar-brand" href="scoreoverview.php"style="cursor:pointer; color:'#f05742'"><i class="fas fa-building"></i> BUILD</a>
+        <a class="navbar-brand" id="btnUp" style="cursor:pointer; color:'#f05742'"><i class="fas fa-arrow-up"></i> SCORES</a>
        
     <!------------------------------- on layer click -------------------->
         <a id='flag' class="navbar-brand" style="display:none; cursor:pointer">FLAG</a>
@@ -155,42 +137,65 @@ if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item active">
-              <a class="nav-link" href="logout.php">Logout
+              <a class="nav-link" href="rules.php">Rules
                 <span class="sr-only">(current)</span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Rules</a>
+              <a class="nav-link" href="logout.php">Logout</a>
             </li>
           </ul>
         </div>
       </div>
     </nav>
     <!--------------------- this is the container with land and tokens ----------------------->  
-    <div class="container-fluid" style="pointer-events: none">
+    <div class="container-fluid mx-3" id="scores1" style="pointer-events: none">
       <div class="row">
         <div class="col-md-12">
-          <h1 class="mt-3"> <?php echo htmlspecialchars($_SESSION['username'])?>, SPOT A VACANT LOT!</h1>
+         <div class="mt-3 wrapper">
+            <h1> Current scores for <?php echo htmlspecialchars($_SESSION['username'])?></h1>
+          </div>
         </div>
+        <div class="col-md-12"> <hr></div>
         <div class="col-md-2"></span>Your tokens: <?php echo $_SESSION['token']?> </div>
         <div class="col-md-2" id ="area"></div>
         <div class="col-md-2" id ="land"></div>
         <div class="col-md-4" id ="flags"></div>
         <div class="col-md-12" id="chart1"> <svg class="chart"></svg></div>
-      </div>
     </div>
-    <!-- Page Content -->
-    <div id="map"></div>
+  </div>
 
   </div> <!--/.fluid-container-->
+  <div id="map"></div>
+<!-- 
+ <div class="container-fluid">
+    <div id="map"></div>
+</div> -->
+
+
+  <div class="modal fade" id="hello" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <div class="modal-title">
+              <h2 class="typeit"><?php echo htmlspecialchars($_SESSION['username'])?>, SPOT A VACANT LOT!</h2>
+          </div>
+        </div>
+        <div class="modal-body" id="modalbody">
+            <p>The goal of this game is to find as much vacant land as possible and secure it. You can increase your area in two ways: <span style="background-color: #cfead9">Click through the images and map vacant land or take lots away from others.</span> Simply click on a lot that you want to acquire. You can end the game anytime. Have fun exploring!</p>
+            </div>
+        <!-- end of dropdown -->
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
 
   <script>
-
-//   function stuffToRezie(){
-//         var h_window = $(window).height();
-//         var h_map = h_window - 125;
-//         $('#map').css('height', h_map);
-// }
 
 // $(window).on("resize", stuffToRezie).trigger('resize'); 
 //----------------setting up all variables-----------
@@ -221,13 +226,21 @@ if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
     var controlsVacant =false;
     var myScore = {area:0, land:0}; //empty array to hold displayed scores
     var flagDefault = 0; 
+    var usage = "default"; 
+    var icon = L.icon({
+    iconUrl: 'css/star.png',
+
+    iconSize:     [20, 20], // size of the icon
+    iconAnchor:   [10, 20], // point of the icon which will correspond to marker's location
+    popupAnchor:  [10, 20] // point from which the popup should open relative to the iconAnchor
+    });
 
    
     // window.onresize = function() {
     //    var width = document.getElementById('map').clientWidth;
     //    console.log('flexwidth', width);
     // };
-    
+  
    
    // Add Tile Layer basemap
     L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
@@ -264,25 +277,15 @@ if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
      var cont2 = document.getElementById('land');
      getScores(cont1,cont2);
 
- //  	var SQLquery2 = "SELECT current_owner,playercolor,sum(area) FROM data_game GROUP BY current_owner, playercolor";
-	// //console.log('are these all the usernames', myjson);
+    console.log("url", document.referrer);
+    var priorLoc =document.referrer;
+    if(priorLoc.indexOf('index.php') != -1) {
+        $('#hello').modal('show');
+    }
 
-	// function test(callback) {
-	// 	  $.getJSON("https://"+cartoDBusername+".carto.com/api/v2/sql?format=JSON&q="+SQLquery2, function (data) {
-	// 	    var container = document.getElementById('area');
-	// 	    container.innerHTML=("Area total: "+data.rows[0].sum);
-	// 	    //getDataCallback(data);
-	// 	    console.log('goddamiit1', data.rows[0].sum);
-	// 	  });
-	// }
-
-	// // function getDataCallback(data) {
-	// //   console.log('goddamiit2', data);
-	// // };
-
-	// test();
-	//console.log('goddamiit3', test());
-	//console.log('hello obj', obj);
+    document.getElementById("btnUp").onclick = function(){
+      scroll("scores1");
+    }
 
 //------------------------ Functions---------------------
     //show controls when button 'vacant' is pressed
@@ -334,6 +337,12 @@ if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
       });
      });
 
+    function scroll(id) {
+    var elmnt = document.getElementById(id);
+    elmnt.scrollIntoView();
+    }
+
+
 //------------------------ Function to load map ---------------------
     //get CARTO selection as geoJSON and add to leaflet map
     function getGeoJSON(){
@@ -375,6 +384,7 @@ if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
            if(sec) { //only show controls if lot is 'acquirable'
                     $("#flag").show(300);
                     $("#acquire").show(300);
+                    $("#controls").hide(300);
                     controlsVacant = false;
                 } else {
                     $("#acquire").hide(300);
@@ -463,24 +473,27 @@ if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
 
 //------------------------ other stuff---------------------
 function getSearchArea(){
-      $.getJSON("./data/points_selected.geojson",{contentType: "application/json; charset=UTF-8"},function(data){
+      $.getJSON("./data/100_features_GiGL.geojson",{contentType: "application/json; charset=UTF-8"},function(data){
         // add GeoJSON layer to the map once the file is loaded
-        //console.log('pointsselected',data.features[session_key].geometry.coordinates[0][0]);
+        console.log('this is session key',session_key);
+        console.log('this is the id of search poly', data.features[session_key].properties.SiteID);
+        //console.log('pointsselected',data.features[session_key].geometry.coordinates[0]);
         //console.log('length',data.features.length);
-        console.log('hello?',session_key);
-        console.log('this is the id of search poly', data.features[session_key].properties.id);
-        var coords1 = data.features[session_key].geometry.coordinates[0][0];
-        var coords2 = data.features[session_key].geometry.coordinates[0][1];
+        var coords1 = data.features[session_key].geometry.coordinates[0];
+        var coords2 = data.features[session_key].geometry.coordinates[1];
         map.panTo(new L.LatLng(coords2,coords1));
+        var label2 = new L.marker([coords2,coords1],{icon: icon}).addTo(map);
+
     });
 }
 
 //------------------------ load map on load---------------------
   $(document).ready(function() {
+    scroll("map");
     $("#flag").hide();
-    getGeoJSON();
-    getSearchArea();
-        //get points
+    getGeoJSON(); //get polygons
+    getSearchArea(); //get centroids
+        
   });
 
 //------------------------features that run when polygon is closed---------------------
@@ -623,9 +636,9 @@ var form = dialog.find("form").on("submit", function(event) {
 //if this button is pressed, session variable 'land' needs to be updated.
 function setData() {
   //purpose of vacant land
-  var e = document.getElementById("usage");
-  var usage = e.options[e.selectedIndex].text;
-  console.log('user selected this', usage);
+  //var e = document.getElementById("usage");
+  //var usage = e.options[e.selectedIndex].text;
+  //console.log('user selected this', usage);
 
   //tracking the land count here. postdata is defined above:
   // postData( "index-username.php", {
@@ -689,7 +702,7 @@ function refreshLayer() {
 };
 
 </script>
-
+<script src="js/typeit.js"></script>
 </body>
 
 </html>

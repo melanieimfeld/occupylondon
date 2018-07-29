@@ -50,67 +50,22 @@ if(isset($_POST['tokenMinusB'])){ //when user bought lot. could have been on map
   </head>
 
   <body>
- 
-<!--  https://stackoverflow.com/questions/15649001/bootstrap-input-field-and-dropdown-button-submit#15649153 -->
-    <div class="modal fade" id="myModal" role="dialog">
-    <div class="modal-dialog">
-    
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title"><i class="fas fa-building"></i>  Secure your lot by building</h4>
-        </div>
-        <div class="modal-body" id="modalbody">
-            <p>You can secure your lot from being bought by others by building something on it. Only the options that fulfil the area requirements are shown. Keep in mind your tokencount.</p>
-        <!-- tryin to put a dropdown in the modal. on submit, send the content to xx --> 
-        <!-- <form name="searchForm" id="searchForm" method="POST" action="php/build.php"> -->
-            <input type="hidden" name="selection" id="buildInput"> 
-            <div class="dropdown">
-              <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Building options
-              <span class="caret"></span></button>
-              <input id="search_type" name="search_type" type="hidden">
-              <ul class="dropdown-menu" id="dropdownBuild">
-              </ul>
-            </div>
-        <!-- end of dropdown -->
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Cancel</button>
-          <button id="allSubmitBtn" class="btn btn-primary">Build!</button>
-        </div>
-      </div>
-      
-    </div>
-  </div>
 
-    <!-- -----------------the dialog element for acquiring--------------------- -->
-<!--     <div id="spinnerControls" style="display:none">
-      <label id="spinnerLabel" for="spinner"></label>
-      <input id="spinner" type="number">
-      <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-    </div>
- -->
     <!------------------------------- Navigation -------------------->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
       <div class="container">
         <a class="navbar-brand" href="map.php" style="cursor:pointer"><i class="fas fa-arrow-left"></i> SPOT MORE</a>
     
-        <!--------------------- these are the control buttons for drawing (new)----------------------->
-        <div id="controls" style="display:none">
-          <a id="startBtn" class="navbar-brand" style="cursor:pointer">start mapping</a>
-          <a id="deleteBtn" class="navbar-brand" style="cursor:pointer">delete</a>
-          <a id="saveBtn" class="navbar-brand" style="cursor:pointer">claim this land</a>
-        </div>
         <!--------------------- all the rest in navbar ----------------------->       
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="rules.php">Rules</a>
-              <span class="sr-only">(current)</span>
+            <li class="nav-item active">
+              <a class="nav-link" href="scoreoverview.php">Score overview
+                <span class="sr-only">(current)</span>
+              </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="logout.php">Logout</a>
@@ -120,84 +75,83 @@ if(isset($_POST['tokenMinusB'])){ //when user bought lot. could have been on map
       </div>
     </nav>
     <!--------------------- this is the container with land and tokens ----------------------->  
-  <div class="container-fluid mx-3 mt-3" id="test">
-    <div class="row">
-      <div class="col-md-5" id="chart1">
-          <h1>Building options</h1>
-          <table class="table table-hover" style="width:100%">
-            <tr>
-              <th>Type</th>
-              <th>Max. Area (sqm)</th> 
-              <th>Cost (Tokens)</th>
-            </tr>
-            <tr>
-              <td>Hospital</td>
-              <td>4'000</td> 
-              <td>70</td>
-            </tr>
-            <tr>
-              <td>Shopping Temple</td>
-              <td>2'000</td> 
-              <td>57</td>
-            </tr>
-            <tr>
-              <td>School</td>
-              <td>2'000</td> 
-              <td>20</td>
-            </tr>
-             <tr>
-              <td>Housing</td>
-              <td>700</td> 
-              <td>7</td>
-            </tr>
-            <tr>
-              <td>Community Center</td>
-              <td>200</td> 
-              <td>2</td>
-            </tr>
-             <tr>
-              <td>Grocery Store</td>
-              <td>100</td> 
-              <td>1</td>
-            </tr>
-              <tr>
-              <td>Community garden</td>
-              <td>100</td> 
-              <td>1</td>
-            </tr>
-            <tr>
-              <td>Pop up bar</td>
-              <td>50</td> 
-              <td>1</td>
-            </tr>
-          </table>
-          <svg class="chart"></svg>
-          <hr>
-          <div class="row">
-            <div class="col-md-4"></span>Your tokens: <?php echo htmlspecialchars($_SESSION['token'])?> </div>
-            <div class="col-md-4" id ="area"></div>
-            <div class="col-md-4" id ="land"></div>
-          </div>
-        </div>
-        <div class="col-md-7">
-          <div id="map" class="mt-3"></div>
-        </div>
-      </div>
+
+<div class="container-fluid">
+    <div class="row mx-5">
+        <div class="col-md-12"><h1 class="mt-3 mx-5" align="center">The rules</h1></div>
+        <div class="col-md-12"><hr></div>
+        <div class="col-md-6"><h3 class="mt-3">Spot and map lots <i class="fas fa-search"></i></h3>Spot and map as many vacant lots as you can by clicking through satellite images. The star <img src="images/star.png" alt="star" style="max-width:5%; max-height:5%;"> indicates where someone surveyed vacant land. It might be possible that there is more vacant land elsewhere in the image. By <span style="background-color: #a9dabb"><a href="scoreoverview.php">clicking through the images</a></span>, you also earn tokens, your game currency.</div>
+
+        <div class="col-md-6"><h3 class="mt-3">Acquire lots <i class="fa fa-shopping-cart" aria-hidden="true"></i></h3>If you come across a lot someone else has mapped while clicking through the images you can acquire it. The price of a lot is dynamic: It depends on how much you are willing to pay, your token count and the amount paid in a previous bid.</div>
+
+        <div class="col-md-6"><h3 class="mt-3">Build! <i class="fas fa-building"></i></h3>Your lot will not be entirely secured from acquirement unless you decide to build something. You can choose different options <span style="background-color: #a9dabb"><a href="scoreoverview.php">here</a></span> based on your lot size and tokens available. Once the lot is occupied, no one will be able to take it from you.</div>
+
+        <div class="col-md-6"><h3 class="mt-3">Flag <i class="fas fa-flag"></i></h3>You think someone mapped a lot that is not vacant? Click on the lot to flag it. If 3 more people agree with you, the lot will be deleted from the database. You are only allowed to flag one property per session.</div>
     </div>
+        
+ <!--  <div class="col-md-12" align="center"> -->
+  <div class="row">
+        <div class="col-md-12"><h1 class="mt-3" align="center">Vacant or not?</h1></div>
+        <div class="col-md-12"><hr></div>
+        <div class="col-md-12">
+          <div id="carouselExampleControls" class="carousel slide mx-5" data-ride="carousel" id="centerAlign">
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <div class="carousel-caption d-none d-md-block">
+                <h1><i class="fas fa-times-circle"></i></h1>
+              </div>
+              <img class="d-block w-50" src="images/ex1.jpg" alt="vacant_buildingsite" style="overflow: hidden">
+            </div>
+            <div class="carousel-item">
+              <div class="carousel-caption d-none d-md-block">
+                <h1><i class="fas fa-check-circle"></i></h1>
+              </div>
+              <img class="d-block w-50" src="images/ex2.jpg" alt="vacant_unused" style="overflow: hidden">
+            </div>
+            <div class="carousel-item">
+              <div class="carousel-caption d-none d-md-block">
+                <h1><i class="fas fa-check-circle"></i></h1>
+              </div>
+              <img class="d-block w-50" src="images/ex3.jpg" alt="vacant_fenced" style="overflow: hidden">
+            </div>
+            <div class="carousel-item">
+               <div class="carousel-caption d-none d-md-block">
+                <h1><i class="fas fa-times-circle"></i></h1>
+              </div>
+              <img class="d-block w-50" src="images/ex4.jpg" alt="vacant_park" style="overflow: hidden">
+            </div>
+          </div>
+            <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="sr-only">Next</span>
+            </a>
+          </div>
+       </div>        
   </div>
+<!--   </div> -->
+</div> <!--/.fluid-container-->
 
-    <!-- Page Content -->
-    
 
-  </div> <!--/.fluid-container-->
+<!--    <div class="col-md-6 mt-3"><img class="img-fluid rounded float-left" src="images/ex1.jpg" alt="vacant1">
+                </div>
+                <div class="col-md-6 mt-3"><img class="img-fluid rounded float-left" src="images/ex1.jpg" alt="vacant1">
+                </div>
+                <div class="col-md-6 mt-3"><img class="img-fluid rounded float-left" src="images/ex1.jpg" alt="vacant1">
+                </div>
+                <div class="col-md-6 mt-3"><img class="img-fluid rounded float-left" src="images/ex1.jpg" alt="vacant1">
+                </div> -->
 
 <script>
 
-function stuffToResize(){
-        var h_window = $(window).height();
-        var h_map = h_window;
-        $('#map').css('height', h_map);
-}
+// function stuffToResize(){
+//         var h_window = $(window).height();
+//         var h_map = h_window;
+//         $('#map').css('height', h_map);
+// }
 
 function build(){
   var y = $('#search_type').val('store');
@@ -205,7 +159,7 @@ function build(){
   //var z = $('#searchForm').submit();
 }
 
-$(window).on("resize", stuffToResize).trigger('resize'); 
+// $(window).on("resize", stuffToResize).trigger('resize'); 
 
 var width = document.getElementById('chart1').clientWidth;
 console.log('clientwidth', width);

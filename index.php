@@ -53,7 +53,7 @@ if (isset($_POST["name"])) {
     $_SESSION['usercolor'] = randCol(80,255);
     // }
   }
-  $_SESSION['array'] = range(0,109);
+  $_SESSION['array'] = range(0,99); //size of lots that need checking
   shuffle($_SESSION['array']);
   header("Location: map.php"); die();
 }
