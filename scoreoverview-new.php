@@ -6,7 +6,6 @@ if (empty($_SESSION['username'])){
 }
 
 if(isset($_POST['tokenMinusB'])){ //when user bought lot. could have been on map.php page but could not turn of automatic redirection
-  echo 'hello';
   $_SESSION['token']=$_SESSION['token']-$_POST['tokenMinusB'];
 } 
 
@@ -64,13 +63,28 @@ if(isset($_POST['tokenMinusB'])){ //when user bought lot. could have been on map
             <p id="buildText"></p>
         <!-- tryin to put a dropdown in the modal. on submit, send the content to xx --> 
         <!-- <form name="searchForm" id="searchForm" method="POST" action="php/build.php"> -->
-            <input type="hidden" name="selection" id="buildInput"> 
+<div class="btn-group"> 
+    <i class="dropdown-arrow dropdown-arrow-inverse"></i>
+    <button class="btn btn-primary status">status</button>
+    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"> <span class="caret"></span> 
+    </button>
+    <ul class="dropdown-menu dropdown-inverse">
+        <li><a href="#fakelink">Mixed-use City in a City</a>
+        </li>
+        <li><a href="#fakelink">School</a>
+        </li>
+        <li><a href="#fakelink">discontinued</a>
+        </li>
+    </ul>
+</div>
+
+         <!--    <input type="hidden" name="selection" id="buildInput"> 
             <div class="dropdown">
               <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Building options
               <span class="caret"></span></button>
               <input id="search_type" name="search_type" type="hidden">
               <ul class="dropdown-menu" id="dropdownBuild">
-                <!-- <li style="cursor:pointer">Mixed-use City in a City</li>
+                <li style="cursor:pointer">Mixed-use City in a City</li>
                 <li style="cursor:pointer">Business Center</li>
                 <li style="cursor:pointer">Hospital</li>
                 <li style="cursor:pointer">School</li>
@@ -79,9 +93,9 @@ if(isset($_POST['tokenMinusB'])){ //when user bought lot. could have been on map
                 <li style="cursor:pointer">Community Center</li>
                 <li style="cursor:pointer">Neighborhood Park</li>
                 <li style="cursor:pointer">Community Garden</li>
-                <li style="cursor:pointer">Pop-up Space</li> -->
+                <li style="cursor:pointer">Pop up space</li>
               </ul>
-            </div>
+            </div> -->
         <!-- end of dropdown -->
         </div>
         <div class="modal-footer">
@@ -135,7 +149,7 @@ if(isset($_POST['tokenMinusB'])){ //when user bought lot. could have been on map
             </tr>
             <tr>
               <td>Mixed-use city in a city</td>
-              <td>40'000</td> 
+              <td>30'000</td> 
               <td>50</td>
             </tr>
             <tr>
@@ -211,7 +225,7 @@ function stuffToResize(){
 $(window).on("resize", stuffToResize).trigger('resize'); 
 
 var width = document.getElementById('chart1').clientWidth;
-//console.log('clientwidth', width);
+console.log('clientwidth', width);
 
   //counting site visits
    var counter = 0;
@@ -233,7 +247,7 @@ var width = document.getElementById('chart1').clientWidth;
     //add data we created from CARTO
     //create a global variable, empty
     var cartoDBpoints = null;  
-    var cartoDBusername = "melanieindemfeld";
+    var cartoDBusername = "melanieimfeld";
     var SQLquery = "SELECT * FROM data_game";  //write the SQL query I want to use
     var playername = <?php echo json_encode($_SESSION['username']); ?>;  //get playername
     var token = <?php echo json_encode($_SESSION['token']); ?>;  
@@ -299,7 +313,7 @@ var width = document.getElementById('chart1').clientWidth;
               //   'Pop up Space':200
               // };
 
-               var buildings = {'Mixed-use City in a City':[40000,1],
+               var buildings = {'Mixed-use City in a City':[30000,50],
                 'Business Center':[10000,40],
                 'Hospital': [8000,35],
                 'School': [4000,30],
@@ -313,15 +327,23 @@ var width = document.getElementById('chart1').clientWidth;
 
               //console.log('accces key', buildings2['Business Center'][0]);
 
-              for (var k in buildings){
-                if (buildings[k][0] >= feature.properties.area){
-                  entry = document.createElement('li');
-                  entry.style.cursor = 'pointer';
-                  entry.appendChild(document.createTextNode(k));
-                  list.appendChild(entry);
-                  console.log('hello?');
-                }
-              }
+              // for (var k in buildings){
+              //   if (buildings[k][0] >= feature.properties.area){
+              //     entry = document.createElement('li');
+              //     entry.style.cursor = 'pointer';
+              //     entry.appendChild(document.createTextNode(k));
+              //     list.appendChild(entry);
+              //     console.log('hello?');
+              //   }
+              // }
+
+              // if (feature.properties.area > 4000) {
+              //     //$("#dropdownBuild").remove();
+              //     console.log('hello?');
+              //     var entry = document.createElement('p');
+              //     entry.appendChild(document.createTextNode('no building fits'));
+              //     //list.appendChild(entry);
+              // }
 
               //console.log('check list',list.childNodes.length);
               var selText;
@@ -329,37 +351,43 @@ var width = document.getElementById('chart1').clientWidth;
               var globalX = feature.properties.cartodb_id;
               var tokenVal = 1;
 
-              $(".dropdown-menu li").click(function(){
-
-                selText = $(this).text(); //type of building
-                selVal=buildings[selText][1]; //the cost belonging to building type
-                console.log(typeof(selVal));
-                console.log('text selected', selText);
-                console.log('cost of selected', buildings[selText][1]);
-                console.log('tokens available', token);
-                //$(this).parents('.btn-group').find('.dropdown-toggle').html(selText+'<span class="caret"></span>');
-                jQuery(function($){
-                  $("#allSubmitBtn").off('click').click(function(e){
-                    if (token >= selVal){
-                    console.log('something submitted?');
-                    var sql ="UPDATE data_game SET usage='"+selText+"', secured="+false+" WHERE cartodb_id="+globalX;
-                    //this is the function that will submit the request to proxy. see line 170
-                    submitToProxy(sql);
-                    $.redirect("scoreoverview.php", {tokenMinusB: selVal}, "POST"); 
-                    $("#myModal").modal('hide');
-                    alert('you built something');
-                    //$("#dropdownBuild").children().remove();
-                    //console.log('building submitted to db and tokes deducted');
-                    } else {
-                      alert('not enough tokens!');
-                    }
-                  });
-                });
-
+              $('.dropdown-inverse li > a').click(function(e){
+                  var x = $('.status').text(this.innerHTML);
+                  console.log("isthistext", x);
+                  var yourText = $(this).text();
+                  console.log("isthistext?", yourText);
               });
 
+              // $(".dropdown-menu li").click(function(){
+
+              //   selText = $(this).text(); //type of building
+              //   selVal=buildings[selText][1]; //the value belonging to type
+              //   console.log(typeof(selVal));
+              //   console.log('text selected', selText);
+              //   console.log('value selected', buildings[selText][1]);
+              //   //$(this).parents('.btn-group').find('.dropdown-toggle').html(selText+'<span class="caret"></span>');
+              //   jQuery(function($){
+              //     $("#allSubmitBtn").click(function(e){
+              //       if (token >= tokenVal){
+              //       console.log('something submitted?');
+              //       var sql ="UPDATE data_game SET usage='"+selText+"', secured="+false+" WHERE cartodb_id="+globalX;
+              //       //this is the function that will submit the request to proxy. see line 170
+              //       submitToProxy(sql);
+              //       $.redirect("scoreoverview.php", {tokenMinusB: tokenVal}, "POST"); 
+              //       $("#myModal").modal('hide');
+              //       alert('you built something');
+              //       //$("#dropdownBuild").children().remove();
+              //       console.log('building submitted to db and tokes deducted');
+              //       } else {
+              //         alert('not enough tokens!');
+              //       }
+              //     });
+              //   });
+
+              // });
+
                 $('#myModal').on('hidden.bs.modal', function () {
-                   $("#dropdownBuild").children().remove();
+                   //$("#dropdownBuild").children().remove();
                   console.log('this is the list when closed', list);
               });
 

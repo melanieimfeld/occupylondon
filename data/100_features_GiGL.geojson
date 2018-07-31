@@ -101,6 +101,19 @@
 { "type": "Feature", "properties": { "SiteName": "No_name4", "SiteID": "04" }, "geometry": { "type": "Point", "coordinates": [ -0.03294454682515435,51.47169543521925 ] } },
 { "type": "Feature", "properties": { "SiteName": "No_name5", "SiteID": "05" }, "geometry": { "type": "Point", "coordinates": [ -0.01534989335493786,51.46783164568808 ] } },
 { "type": "Feature", "properties": { "SiteName": "No_name6", "SiteID": "06" }, "geometry": { "type": "Point", "coordinates": [ 0.1033385423427347,51.5281016045945 ] } },
-{ "type": "Feature", "properties": { "SiteName": "Vacant Land West of W. Parkside \/ Pear Tree Way Junction", "SiteID": "OS_Gr_0393" }, "geometry": { "type": "Point", "coordinates": [ 0.015806371958403, 51.491574568135384 ] } }
+{ "type": "Feature", "properties": { "SiteName": "Vacant Land West of W. Parkside Pear Tree Way Junction", "SiteID": "OS_Gr_0393" }, "geometry": { "type": "Point", "coordinates": [ 0.015806371958403, 51.491574568135384 ] } },
+{ "type": "Feature", "properties": { "SiteName": "Quebec Way Rough", "SiteID": "OS_So_0174" }, "geometry": { "type": "Point", "coordinates": [ -0.04167477512994, 51.499382316544839 ] } },
+{ "type": "Feature", "properties": { "SiteName": "Silwood Open Space", "SiteID": "OS_Le_0236" }, "geometry": { "type": "Point", "coordinates": [ -0.046662740084157, 51.488058613900023 ] } },
+{ "type": "Feature", "properties": { "SiteName": "Gervase Street Wood", "SiteID": "OS_So_0066" }, "geometry": { "type": "Point", "coordinates": [ -0.058202831717697, 51.479562078239226 ] } },
+{ "type": "Feature", "properties": { "SiteName": "DLR Bunds (Cable Street)", "SiteID": "OS_TH_0083" }, "geometry": { "type": "Point", "coordinates": [ -0.061982649979694, 51.511173984689158 ] } },
+{ "type": "Feature", "properties": { "SiteName": "Spa Rd Rough", "SiteID": "OS_So_0130" }, "geometry": { "type": "Point", "coordinates": [ -0.067969506557312, 51.496585873495988 ] } },
+{ "type": "Feature", "properties": { "SiteName": "Brewhouse Lane vacant land", "SiteID": "OS_TH_0040" }, "geometry": { "type": "Point", "coordinates": [ -0.057899903268443, 51.503635983850891 ] } },
+{ "type": "Feature", "properties": { "SiteName": "St James Road Rough", "SiteID": "OS_So_0138" }, "geometry": { "type": "Point", "coordinates": [ -0.065158409877568, 51.484011544388295 ] } },
+{ "type": "Feature", "properties": { "SiteName": "Thameside Green", "SiteID": "OS_TH_0262" }, "geometry": { "type": "Point", "coordinates": [ -0.0674971610831, 51.504470899769807 ] } },
+{ "type": "Feature", "properties": { "SiteName": "Cable Street", "SiteID": "OS_TH_0046" }, "geometry": { "type": "Point", "coordinates": [ -0.065473960681109, 51.511078480268907 ] } },
+{ "type": "Feature", "properties": { "SiteName": "Watney Market Waste", "SiteID": "OS_TH_0291" }, "geometry": { "type": "Point", "coordinates": [ -0.057336636131215, 51.512853829463012 ] } },
+{ "type": "Feature", "properties": { "SiteName": "Colegrove Road Rough", "SiteID": "OS_So_0024" }, "geometry": { "type": "Point", "coordinates": [ -0.07253545248759, 51.481844723420224 ] } },
+{ "type": "Feature", "properties": { "SiteName": "Surrey Quays Phase II", "SiteID": "OS_So_0150" }, "geometry": { "type": "Point", "coordinates": [ -0.04663272493202, 51.497949129155579 ] } },
+{ "type": "Feature", "properties": { "SiteName": "Wellclose Street Park Rough", "SiteID": "OS_TH_0294" }, "geometry": { "type": "Point", "coordinates": [ -0.066405503768929, 51.509516807352306 ] } }
 ]
 }

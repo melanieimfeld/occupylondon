@@ -1,21 +1,9 @@
-// var sumStats = [13.1, 12.3, 11.0, 12.1, 18.2, 21.0, 24.0];
-// var statsText = ['x', 'y', 'z', 'a', 'b', 'y', 'u'];
-//var width = $('chart1').width();
-//var width1 = document.getElementById('chart1').clientWidth;
-//  var width = document.getElementById('chart1').clientWidth;
-
-// window.onresize = function() {
-//       width = document.getElementById('chart1').clientWidth;
-//        //console.log('flexwidth', width);
-//   };
-
- function barGraph(values, text, color){
+function barGraph(values, text, color){
 
   // var width = 600,
   var width = document.getElementById('chart1').clientWidth-20,
   barHeight = 25;
   
-
 // pass a function to map (scale values)
   var values2 = values.map(x => x * 0.01);
   //console.log(values2);
@@ -25,7 +13,6 @@
       .domain([0, d3.max(values2)])
       .range([0, width]);
   
-  console.log(x);
   //set svg
   var chart = d3.select(".chart")
       .attr("width", width)
@@ -57,16 +44,7 @@
       .style("font-weight", "bold")
       .style("fill", "#f05742");
 
-  //append the title
-  // bar.append("text")           
-  //         .attr("y", barHeight*values2.length + 2)
-  //         .attr("dy", "-.3em") 
-  //         .style("font-size", "10px") 
-  //         .style("fill", "#faccc6")  
-  //         .text("% of area that is settlement");
   };
-
-
 
 //this function load summary stats on load
 function getScores(elem1, elem2){
@@ -92,37 +70,6 @@ function getScores(elem1, elem2){
           myScore['land']= data.rows[i].count;
         }
       }
-
-//         for (var c=0; c<namedb.length; c++) {
-//           if (namedb.charCodeAt(c) != playername.charCodeAt(c)) {
-//               console.log('if charCode unequal this should pop up',namedb.charCodeAt(c),playername.charCodeAt(c));
-//           }
-// }
-   
-    
-      //console.log('show me the username from db', data.rows[i].current_owner, typeof(data.rows[i].current_owner));
-
-        // if (data.rows[i].current_owner == playername){
-        //   console.log('match found in user db');
-        //   myArr.push({
-        //       area: data.rows[i].sum,
-        //       land: data.rows[i].count
-        //   });
-        // } else { //user hasn't classified anything and is therefore not in db
-        //   console.log('no match found in user db');
-        //   myArr.push({
-        //       area: 0,
-        //       land: 0
-        //   });
-        // }
-      // if(names.includes(playername)==false){
-      //   console.log('yes youre new');
-      //   myArr.push({
-      //     area: 0,
-      //     land: 0
-      //   });
-
-      // };
       
       elem1.innerHTML=("Your area: "+myScore.area);
       elem2.innerHTML=("Your lots: "+myScore.land);

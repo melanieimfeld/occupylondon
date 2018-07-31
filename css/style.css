@@ -148,11 +148,11 @@ hr{
   display: inline-block !important;
 }
 
-#modalbody{
-  -webkit-column-count: 2; /* Chrome, Safari, Opera */
-  -moz-column-count: 2; /* Firefox */
+/*#modalbody{
+  -webkit-column-count: 2; 
+  -moz-column-count: 2; 
   column-count: 2;
-}
+}*/
 
     /* THE TYPING EFFECT */
 @keyframes typing {

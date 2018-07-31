@@ -92,11 +92,12 @@ function randCol($minVal = 0, $maxVal = 255){
 	<div class="row" style="height:100%; align-items: center;">
 	  <div class="container align-middle" style="text-align:center">
 	    <div class="col-md-12 col-md-offset-12">
-	       <div id="header">
-	        <h1>Hi, please enter a name for this session</h1>
-	        </div>
+	   
+          <h1>SPOT-A-LOT</h1>
+           <div class="col-md-12"><hr></div>
+	        <h3>Please enter a player name for this session</h3>
 	        <form method="post">
-	        Please only use letters<br>
+	        Only use letters or a combination of letters and numbers<br>
 	        <input type="text" name="name" required><br>
 	        <!-- <input type="submit"> -->
 	        <button type="submit" href="map.php" class="btn btn-primary" style="margin-top:1em">START</button>
