@@ -12,17 +12,6 @@ if (isset($_POST["name"])) {
 
   $_SESSION["username"]=iconv("ASCII" , "UTF-8//IGNORE" ,$_POST["name"]);
   $name = $_POST["name"];
-
-  	//echo $_SESSION["username"];
-
-//   if (strlen($_SESSION["username"]) != strlen(utf8_decode($_SESSION["username"])))
-// {
-//     echo 'is unicode';
-// }
-	//echo mb_check_encoding($name,"UTF-8");
-	//$ord = unpack('N', mb_convert_encoding($name, 'UCS-4BE', 'UTF-8'));
-
-	//echo $ord[1];
   echo mb_detect_encoding ($_SESSION["username"]);
   //$test = mb_convert_encoding($_SESSION["username"], "UTF-16");
   //echo mb_detect_encoding ($test);
@@ -30,9 +19,6 @@ if (isset($_POST["name"])) {
   $queryURL = "SELECT playercolor,current_owner FROM data_game WHERE current_owner='$name' LIMIT 1";
   $return = goProxy($queryURL) or die('unable to connect');
   $return =  json_decode($return, true);
-  //echo json_last_error_msg();
-  //echo var_dump($return);
-  //echo $return;
 
   //numbers are not recognized and true is returned
   if (!in_array($name ,$return)){
@@ -48,8 +34,6 @@ if (isset($_POST["name"])) {
     //make new color (....that doesn't exist yet!)
     $_SESSION['usercolor'] = "#9091ED";
     echo $_SESSION['usercolor'];
-    // if(!in_array($_SESSION['usercolor'],$return)){ //extra: make sure that color is only used one
-    //   echo ' color already exists';
     $_SESSION['usercolor'] = randCol(80,255);
     // }
   }
@@ -73,8 +57,6 @@ function randCol($minVal = 0, $maxVal = 255){
     return sprintf('#%02X%02X%02X', $r, $g, $b);
 }
 
-
-//if ($_SESSION['username']!=0) echo '<div id="form-submit-alert">Form Submitted!</div>';
 ?>
 
 <!DOCTYPE html>

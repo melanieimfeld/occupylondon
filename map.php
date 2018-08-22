@@ -1,36 +1,34 @@
 <?php
 include 'php/cartoDBProxy.php';
-//include 'php/session.php';
 session_start();
-include 'php/session.php';
 
-// $NoSearchPolys =112; //total images in the game
+$NoSearchPolys =112; //total images in the game
 
-// //if no username was defined send user back to login page
-// if (empty($_SESSION['username'])){
-//  	header("Location: index.php");
-// }
+//if no username was defined send user back to login page
+if (empty($_SESSION['username'])){
+ 	header("Location: index.php");
+}
 
-// //---------------all tokenupdates-----------------
-// if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
-// 	$_SESSION['token']=$_SESSION['token']+1;
-// 	//echo $_SESSION['token'];
-// if ($_SESSION['count']< $NoSearchPolys){
-//  	$_SESSION['count']++;
-// } else {
-//  	$_SESSION['count']=0;
-// }
-// //echo $counter+1;
-// } elseif(isset($_POST['tokenMinus'])){ //user acquired another lot or bought something
-// 	//echo 'Session var before operation '.$_SESSION['token'];
-// 	$_SESSION['token']=$_SESSION['token']-$_POST['tokenMinus'];
-// 	//echo 'Session var after operation '.$_SESSION['token'];
-// 	//echo 'bid '.$_POST['tokenMinus'];
-// } elseif (!isset($_SESSION['token'])) { //this should only happen when user just entered the game
-//   	$_SESSION['token']=0;
-//   	$_SESSION['count']=0;
-//     //echo 'else statement, reason why token turns zero?'.$_SESSION['token']; 
-// }
+//---------------all tokenupdates-----------------
+if(isset($_POST['tokenBool'])){ //user clicked 'spot more'
+	$_SESSION['token']=$_SESSION['token']+1;
+	//echo $_SESSION['token'];
+if ($_SESSION['count']< $NoSearchPolys){
+ 	$_SESSION['count']++;
+} else {
+ 	$_SESSION['count']=0;
+}
+//echo $counter+1;
+} elseif(isset($_POST['tokenMinus'])){ //user acquired another lot or bought something
+	//echo 'Session var before operation '.$_SESSION['token'];
+	$_SESSION['token']=$_SESSION['token']-$_POST['tokenMinus'];
+	//echo 'Session var after operation '.$_SESSION['token'];
+	//echo 'bid '.$_POST['tokenMinus'];
+} elseif (!isset($_SESSION['token'])) { //this should only happen when user just entered the game
+  	$_SESSION['token']=0;
+  	$_SESSION['count']=0;
+    //echo 'else statement, reason why token turns zero?'.$_SESSION['token']; 
+}
 
 ?>
 
