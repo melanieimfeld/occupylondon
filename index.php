@@ -2,7 +2,7 @@
 include 'php/cartoDBProxy.php';
 ini_set('display_errors',true);
 session_start();
-
+//include 'php/session.php';
 
 //if username was submitted
 if (isset($_POST["name"])) {
@@ -74,7 +74,7 @@ function randCol($minVal = 0, $maxVal = 255){
 }
 
 
-// if ($_SESSION['username']!=0) echo '<div id="form-submit-alert">Form Submitted!</div>';
+//if ($_SESSION['username']!=0) echo '<div id="form-submit-alert">Form Submitted!</div>';
 ?>
 
 <!DOCTYPE html>
