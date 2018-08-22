@@ -3,8 +3,10 @@
 This is an alpha prototype for a web game that aims to crowd source data on land vacancy in London. 
 
 ## File structure
-index.php - 
-
+index.php - login page
+map.php - main page including interactive mapping
+built.php - overview and building element
+logout.php - logout and session destroyed
 
 ## Built With
 
