@@ -6,6 +6,7 @@ This is an alpha prototype for a web game that aims to crowd source data on land
 index.php - login page <br>
 map.php - main page including interactive mapping <br>
 built.php - overview and building element<br>
+rules.php - game mechanisms and rules<br>
 logout.php - logout and session destroyed<br>
 
 ## Built With
