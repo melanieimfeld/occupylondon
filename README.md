@@ -1,6 +1,19 @@
-# occupylondon
-crowdsourcing information about vacant lots in London
+# Playable city: using gaming to crowd source data on vacant land
 
-```xml
-<mxfile userAgent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:61.0) Gecko/20100101 Firefox/61.0" version="9.0.2" editor="www.draw.io" type="device"><diagram name="Page-1" id="8ce9d11a-91a2-4d17-14d8-a56ed91bf033">7Zrdk6I4EMD/GqvuXraEAOKjX+c55e04Olt79xghamqj8UL8mPvrrxGCQmDHcZHdUn3Q0Amd2L/upBOooc5y3xd4vfiL+4TVzLq/r6FuzTSNpmnBTyh5iySOU48Ec0H9uNFRMKH/kViomm2oT4JUQ8k5k3SdFnp8tSKeTMmwEHyXbjbjLN3rGs+JJph4mOnSr9SXi0jqmo2j/E9C5wvVs+E0o5op9r7NBd+s4v5qJpodPlH1Eitd8R8NFtjnuxMR6tVQR3Auo9Jy3yEstK0yW3TfHwW1ybgFWclzbjAb8UC2mG2IGrPD4Oa2T7ehORmdrw4Vzr+bcFhtRmbyeAWlefjbWmNvQWphf9HtU6GqlASGcdCZln6smzFZchl2MyFiS8T5nR2sLd8U4QMjElqhDtW7BZVkAv8grN2BT4NsIZcMrgwozihjHc64gOsVX0GjthqviLygzfCUsBEPqKQ8lB9Gj9owREnBr4aZ6iX1/XAoSYNWrC+piLFANdkXwjUSl4FQJHxJpHiDJvENim0chLb5yY4Eu6NP24YTyRYn/oxUHOI4juaJ7qMvQSF2pwLXcmzNtbpY4ikOQn5gDNkfTDQwEBHrsOi9MQqExPt0phHK4TQRJEH4vJGghcTyI3OjHAO7iUVjE1u5Nraadd3GbikmdkqK3g4Wkj9Cpyh0LHR27BhmGWAbbg7YgkiZMbJvhYse/HWy8uNi12M4CKhXjOO4NimTEV9bFt812Kk9ctxcyQRhWNJtWn2eieIeRpxCxwkPVE8DQXZDAVFKAr4RHonvO13y3lF1wlapkljMidRUHaglf/1MkM0HyJT1rXetfzZIK8cn6sePcTWorvGAmiJhpEkY4TJYTOJswBm1EE1XjFTXfEBNh5edyW5y7H9+rGaVhT5SryZakQa20xq/PoebiJchfLdGA/j+bdybvP6uIYccQqaBBlLwbyST1Hwnz/GA5yGPLUxY8nKodJZV+/GUBrmNDAKk8tIThzKtHI8qJaVxLQ3D08uX3vifkMBT6+/btbydmcaQlZNMXs3wCH18kxAbTtsmTAjMb3z1ab1YX7zzVnNoRDe9JzthnUfmHNQl8DKdbKSYDtKAJYl+audcCrC8nPEyYODzbCT4/u3GkRnZVKFSYCp0SwEGG/GOID7UU8yCO+OG6pVy0/P4p8nzZ5D0B/1hoTmvfjRVkfEtdEbQoBzjl3F2hSw9376TfEDPxKpOCSw9JU5sP+51B+Ne5xWKo+GX/uDz7YIw6+7PxaCfkF+6bjA+p7eel2UXC3VIWs1aUV4WvcTrOyNlGJWiapSGKvC4IBxssaVkd+PQTCc9G1YbXnkPPC5jJjaM3HrenGVVcYCVt0GFdYtv5I3Tskzz50WWrefZhSa8h3Ntp+mkQ0ctFx8907bdrCKnmudPyNbT98se+7c5l5C743VRqF2idEgw+JEsU+XTy4aETK/5ZlEX/aozEBZe/IqcWdKLK41MftbUN/5uTgQayCxjQtIfBFx8WhYE0B5sSIJfFd4Vlo9qF3s7b5N6x+uH1bTKey6qK8s+FzXR9ZaRvC3tHZM1mulZ8eQ46KNcs6oMu1kZ1cerY2kUjobiQqaO5h4lQYTL4yvfUfPje/Wo9z8=</diagram></mxfile>
-```
+This is an alpha prototype for a web game that aims to crowd source data on land vacancy in London. 
+
+## File structure
+index.php - 
+
+
+## Built With
+
+* [Carto](https://carto.com/) - Database management
+* [Leaflet draw](https://github.com/Leaflet/Leaflet.draw) - User web mapping
+* [Jquery](https://api.jquery.com/)
+* [Bootstrap](https://v4-alpha.getbootstrap.com/) - Static framework
+* [D3](https://d3js.org/) - Graphs
+
+## Acknowledgments
+
+* [MIT DUSPVIZ](http://duspviz.mit.edu/)
