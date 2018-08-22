@@ -10,7 +10,7 @@ logout.php - logout and session destroyed<br>
 
 ## Built With
 
-* [Carto](https://carto.com/) - Database management (Carto accound required!)
+* [Carto](https://carto.com/) - Database management (Carto account required!)
 * [Leaflet draw](https://github.com/Leaflet/Leaflet.draw) - User web mapping
 * [Jquery](https://api.jquery.com/)
 * [Bootstrap](https://v4-alpha.getbootstrap.com/) - Static framework
