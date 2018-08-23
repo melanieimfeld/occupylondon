@@ -26,3 +26,6 @@ logout.php - logout and session destroyed<br>
 ## Acknowledgments
 
 * [MIT DUSPVIZ](http://duspviz.mit.edu/)
+
+## License
+![Creative Commons](http://url/to/img.png)
