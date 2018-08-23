@@ -28,4 +28,4 @@ logout.php - logout and session destroyed<br>
 * [MIT DUSPVIZ](http://duspviz.mit.edu/)
 
 ## License
-![Creative Commons](https://github.com/melanieimfeld/playable_city/tree/master/images)
+![Creative Commons CC BY](https://github.com/melanieimfeld/playable_city/tree/master/images/by.png)
