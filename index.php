@@ -1,5 +1,5 @@
 <?php
-include 'php/cartoDBProxy.php';
+include 'php/cartoCredentials.php';
 ini_set('display_errors',true);
 session_start();
 //include 'php/session.php';
@@ -47,7 +47,6 @@ function randCol($minVal = 0, $maxVal = 255){
     // Make sure the parameters will result in valid colours
     $minVal = $minVal < 0 || $minVal > 255 ? 0 : $minVal;
     $maxVal = $maxVal < 0 || $maxVal > 255 ? 255 : $maxVal;
-
     // Generate 3 values
     $r = mt_rand($minVal, $maxVal);
     $g = mt_rand($minVal, $maxVal);

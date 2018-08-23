@@ -1,5 +1,5 @@
 <?php
-include 'php/cartoDBProxy.php';
+include 'php/cartoCredentials.php';
 session_start();
 
 $NoSearchPolys =112; //total images in the game
