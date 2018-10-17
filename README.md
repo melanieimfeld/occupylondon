@@ -8,6 +8,9 @@ Wired magazine sees crowdsourcing as the ‘new pool of cheap labor’ where any
 
 This thesis will introduce a game design methodology for crowd sourcing games. In addition, the online game prototype will be critically evaluated based on two aspects: Firstly, whether a game can create an entertaining experience for players and secondly, whether it can generate scientifically relevant data.
 
+## Prototype
+https://play.imfeld.info/
+
 ## File structure
 index.php - login page <br>
 map.php - main page including interactive mapping <br>
