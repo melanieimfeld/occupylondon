@@ -26,7 +26,7 @@ The London Development Agency (LDA) and the Homes and Communities Agency (HCA) r
 
 EDIT: Just recently, the online news platform Citylab published an interesting article on the topic of land vacancy, land banking and property guardianship. Read here: https://www.citylab.com/solutions/2018/10/londons-empty-spaces/572011/
 
-## Prototype
+## Prototype (Chrome recommended)
 https://play.imfeld.info/
 
 ## File structure
